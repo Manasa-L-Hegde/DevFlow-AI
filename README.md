@@ -2,7 +2,7 @@
 
 ## 📌 Problem Statement
 
-Business users and developers waste time writing SQL queries manually to extract insights from data. 
+Business users and developers waste time writing SQL queries manually to extract insights from data. NLytics solves this by converting plain English questions into MySQL queries instantly, running them live, and visualizing results with AI-generated business insights — making data analytics accessible to everyone. 
 
 **NLytics solves this by converting plain English questions into MySQL/SQLite queries instantly, running them live, and visualizing results with AI-generated business insights — making data analytics accessible to everyone.**
 
@@ -320,15 +320,5 @@ If you encounter issues:
 
 ---
 
-## 🎓 Built For Hackathons
-
-This project is designed to be:
-- **Quick to setup** - Get running in 10 minutes
-- **Hackathon-friendly** - Focus on AI workflow, not infrastructure
-- **Portfolio-worthy** - Impressive project for LinkedIn/interviews
-- **Extensible** - Easy to add features during hackathon
-- **Production-light** - No complex deployment needed
-
----
 
 **Happy analyzing! 📊✨**
