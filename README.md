@@ -1,10 +1,10 @@
 # 🚀 NLytics_AI - AI Business Analytics Assistant
 
+**[🎯 Live Demo](https://manasa-l-hegde-nlytic-ai-app-mvrisf.streamlit.app/)** — Try it now on Streamlit Cloud!
+
 ## 📌 Problem Statement
 
-Business users and developers waste time writing SQL queries manually to extract insights from data. NLytics solves this by converting plain English questions into MySQL queries instantly, running them live, and visualizing results with AI-generated business insights — making data analytics accessible to everyone. 
-
-**NLytics solves this by converting plain English questions into MySQL/SQLite queries instantly, running them live, and visualizing results with AI-generated business insights — making data analytics accessible to everyone.**
+Business users and developers waste time writing SQL queries manually to extract insights from data. NLytics solves this by converting plain English questions into MySQL/SQLite queries instantly, running them live, and visualizing results with AI-generated business insights — making data analytics accessible to everyone.
 
 ---
 
@@ -55,7 +55,64 @@ NLytics/
 
 ---
 
-## 🚀 Getting Started
+## � Project Overview
+
+### What NLytics Does
+NLytics is an AI-powered SQL assistant that bridges the gap between natural language and databases. Users ask business questions in plain English, and the app:
+1. Converts questions to SQL using Groq's LLM
+2. Executes queries on live databases
+3. Auto-detects the best visualization (bar, line, pie charts)
+4. Provides business-ready insights and explanations
+
+### ✅ Advantages
+- **No SQL Knowledge Required** – Business users can analyze data without SQL expertise
+- **Fast Query Generation** – Instant SQL from natural language (powered by Groq LLM)
+- **Automatic Visualizations** – Smart chart detection (bar, line, pie, frequency)
+- **Data-Aware AI** – AI sees the actual schema before generating queries, reducing hallucination
+- **Dataset Bootstrap** – Auto-initializes SQLite database on deployment from bundled Excel
+- **Read-Only Safety** – Queries are SELECT-only, protecting data integrity
+- **Low Infrastructure** – Runs on SQLite, no complex database setup needed
+- **Clear Transparency** – Shows generated SQL so users can verify logic
+- **Query History** – Tracks and lets users reuse previous queries
+
+### ⚠️ Disadvantages & Limitations
+- **Date Anchoring Issues** – Trend queries on historical data required custom date window adjustments
+- **Schema Dependency** – AI must see exact column names; typos in questions can cause failures
+- **Limited Query Complexity** – Complex joins, subqueries, or window functions may not work reliably
+- **No INSERT/UPDATE/DELETE** – Read-only by design; no data modification capability
+- **Large Result Sets** – Auto-limited to 100K rows to prevent UI slowdowns
+- **Single Table Focus** – Works best on single-table queries; multi-table joins need schema awareness
+- **API Rate Limits** – Groq API has usage limits; high-volume deployments may hit quotas
+- **Visualization Fallback** – Text-only results don't always render charts; frequency distribution is fallback
+
+### 🔧 How Limitations Can Be Solved
+1. **Better Date Handling** → Add temporal awareness and dataset-relative date logic (✅ DONE)
+2. **Smarter Schema Context** → Provide sample values to AI, not just column names
+3. **Complex Query Support** → Use multi-turn LLM conversation to refine queries
+4. **Data Modification** → Add audit logging and role-based access if needed
+5. **Result Set Handling** → Implement pagination and lazy loading for large results
+6. **Multi-Table Queries** → Embed relationship hints in schema prompt
+7. **Better Visualization** → Add heuristics for more chart types (scatter, heatmap, boxplot)
+
+### 🎨 UI/UX Assessment
+**Strengths:**
+- **Dark theme is elegant** – Cyber-violet gradient is modern and reduces eye strain
+- **Tab organization is logical** – Analytics → SQL → Insights → Schema flows naturally
+- **Clear visual hierarchy** – Hero section draws attention, buttons are prominent
+- **Status indicators are helpful** – Database/API ready status in sidebar gives quick feedback
+- **Hover effects feel responsive** – Pills and cards have nice transitions
+
+**Areas for Improvement:**
+- **Mobile responsiveness** – Layout could be better optimized for phones/tablets
+- **Loading states** – Could show skeleton loaders while SQL is generating instead of just spinner
+- **Error messages** – Some technical errors are too verbose for business users
+- **Chart customization** – Users can't control colors, axes, or legend positioning
+- **Keyboard navigation** – Tab ordering could be more intuitive
+- **Accessibility** – Some text lacks sufficient contrast; ARIA labels are minimal
+
+---
+
+## �🚀 Getting Started
 
 NLytics uses the Groq API for AI query generation. The app talks to Groq through the OpenAI-compatible Python SDK, so the codebase keeps the integration lightweight while still using Groq as the actual model provider.
 
@@ -226,14 +283,22 @@ python -c "from db import get_database_schema; print(get_database_schema())"
 
 ## 🔐 Security Considerations
 
-- **Never commit `.env` file** - contains API keys
-- **Queries are read-only** - no data modification
-- **API calls are logged** - review your Groq usage regularly
-- **Database contains business data** - secure appropriately
+### .env File & GitHub
+- **`.env` is NOT in GitHub** – Protected by `.gitignore` to prevent API key leakage
+- **Never commit `.env` file** – Contains sensitive Groq API keys
+- **Local development** – Keep `GROQ_API_KEY` in `.env` locally only
+- **Deployed app (Streamlit Cloud / Render / Railway)** – Add `GROQ_API_KEY` as a platform secret/environment variable, never in code
+- **Best practice** – Use platform-managed secrets; never hardcode credentials
+
+### General Security
+- **Queries are read-only** – Only SELECT queries allowed; no data modification
+- **API calls are logged** – Review your Groq usage regularly for cost and abuse detection
+- **Database contains business data** – Secure and back up your SQLite database appropriately
+- **Input validation** – User questions are passed to LLM; always review generated SQL before running in production
 
 ---
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### **Error: "No tables found"**
 ```
