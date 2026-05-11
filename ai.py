@@ -1,6 +1,6 @@
 """
 AI/LLM Module
-Handles OpenAI API integration for natural language to SQL conversion
+Handles Groq API integration for natural language to SQL conversion
 """
 
 from dotenv import load_dotenv
@@ -16,7 +16,9 @@ except ImportError:
 
 
 # Load environment variables from .env file
-load_dotenv()
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ENV_PATH = os.path.join(BASE_DIR, ".env")
+load_dotenv(ENV_PATH)
 
 
 def get_openai_client():
@@ -39,7 +41,7 @@ def get_openai_client():
 
 def generate_sql_from_question(question: str) -> Tuple[str, str]:
     """
-    Convert user's natural language question to SQL query using OpenAI.
+    Convert user's natural language question to SQL query using Groq.
     
     Args:
         question (str): User's question in plain English
@@ -54,7 +56,7 @@ def generate_sql_from_question(question: str) -> Tuple[str, str]:
     # Get the database schema formatted for AI
     schema_info = get_schema_for_prompt()
     
-    # Build the prompt for ChatGPT
+    # Build the prompt for Groq
     system_prompt = f"""You are an expert SQL data analyst and AI assistant for NLytics.
 
 Your task is to convert natural language business questions into precise SQLite SQL queries and provide clear, professional explanations.
@@ -67,12 +69,13 @@ IMPORTANT RULES:
 3. Use COUNT(*) for counts, SUM() for totals, AVG() for averages
 4. Column and table names are CASE SENSITIVE - use exact names from schema
 5. Always wrap table and column names in backticks
-6. Return results in a format that can be visualized
-7. Never hallucinate columns or tables - ONLY use what's in schema
-8. Use proper JOIN syntax if multiple tables needed
-9. For filtering, use WHERE clauses
-10. For sorting, use ORDER BY
-11. Return JSON with two keys: "sql" and "explanation"
+6. Prefer chart-friendly aggregates and rankings when the question asks for comparisons, trends, summaries, or top/bottom lists
+7. Return results in a format that can be visualized whenever possible
+8. Never hallucinate columns or tables - ONLY use what's in schema
+9. Use proper JOIN syntax if multiple tables needed
+10. For filtering, use WHERE clauses
+11. For sorting, use ORDER BY
+12. Return JSON with two keys: "sql" and "explanation"
 """
     
     user_message = f"""
@@ -86,7 +89,7 @@ If a requested field does not exist, choose the closest valid column from the sc
 Return EXACTLY in this format (valid JSON):
 {{
     "sql": "SELECT ... FROM ...",
-    "explanation": "Provide a thorough, business-friendly explanation of exactly what this query calculates, how it works, and what the user should expect from the results. Be highly professional, clear, and ensure this serves as a proper, definitive answer to their underlying question."
+    "explanation": "Provide a thorough, business-friendly final answer that directly addresses the user's question, explains exactly what this query calculates, how it works, and what the user should expect from the results. Be highly professional, clear, and make the response feel complete and decision-ready."
 }}
 """
     
@@ -96,7 +99,7 @@ Return EXACTLY in this format (valid JSON):
         return "", "Groq API key is not configured or the OpenAI SDK is unavailable"
 
     try:
-        # Call OpenAI API with the modern SDK.
+        # Call Groq API with the modern SDK.
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
@@ -118,7 +121,7 @@ Return EXACTLY in this format (valid JSON):
             return "", f"AI Response (not valid JSON): {ai_response}"
 
     except Exception as e:
-        return "", f"OpenAI API Error: {str(e)}"
+        return "", f"Groq API Error: {str(e)}"
 
 
 def explain_query(query: str) -> str:

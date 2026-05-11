@@ -42,18 +42,18 @@ def load_excel_to_sqlite(excel_file: str, table_name: str = "train"):
     try:
         # Check if file exists
         if not os.path.exists(excel_file):
-            print(f"❌ Error: {excel_file} not found!")
+            print(f"[ERROR] {excel_file} not found!")
             return False
         
         # Read Excel file
-        print(f"📂 Loading {excel_file}...")
+        print(f"[INFO] Loading {excel_file}...")
         df = pd.read_excel(excel_file)
 
         # Normalize column names so SQL generation stays reliable.
         original_columns = list(df.columns)
         df.columns = [normalize_column_name(column) for column in df.columns]
         
-        print(f"✅ File loaded: {len(df)} rows, {len(df.columns)} columns")
+        print(f"[OK] File loaded: {len(df)} rows, {len(df.columns)} columns")
         print("Original -> Normalized columns:")
         for original, normalized in zip(original_columns, df.columns):
             print(f"  {original} -> {normalized}")
@@ -63,16 +63,16 @@ def load_excel_to_sqlite(excel_file: str, table_name: str = "train"):
         
         # Replace table if it exists
         df.to_sql(table_name, engine, if_exists='replace', index=False)
-        print(f"✅ Data loaded into table '{table_name}'")
+        print(f"[OK] Data loaded into table '{table_name}'")
         
         # Display preview
-        print(f"\n📊 Preview of {table_name} table:")
+        print(f"\n[INFO] Preview of {table_name} table:")
         print(df.head())
         
         return True
         
     except Exception as e:
-        print(f"❌ Error loading data: {str(e)}")
+        print(f"[ERROR] Error loading data: {str(e)}")
         return False
 
 
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     success = load_excel_to_sqlite("train.xlsx", "train")
     
     if success:
-        print("\n✅ Data loading complete!")
+        print("\n[OK] Data loading complete!")
         print("You can now run: streamlit run app.py")
     else:
-        print("\n❌ Data loading failed. Check the error above.")
+        print("\n[FAILED] Data loading failed. Check the error above.")

@@ -16,7 +16,7 @@ Business users and developers waste time writing SQL queries manually to extract
 ✅ **Query History** - Track and reuse previous queries  
 ✅ **Data Explorer** - Browse databases, explore tables, inspect schemas  
 ✅ **CSV Export** - Download query results for further analysis  
-✅ **AI Insights** - Get business insights powered by OpenAI  
+✅ **AI Insights** - Get business insights powered by Groq  
 
 ---
 
@@ -26,7 +26,7 @@ Business users and developers waste time writing SQL queries manually to extract
 NLytics/
 │
 ├── app.py              # Main Streamlit application (entry point)
-├── ai.py               # OpenAI integration (NL → SQL conversion)
+├── ai.py               # Groq integration (NL → SQL conversion)
 ├── db.py               # Database connection & query execution
 ├── schema.py           # Database schema inspector & formatter
 ├── charts.py           # Plotly visualization & chart rendering
@@ -48,7 +48,7 @@ NLytics/
 |-------|-----------|
 | **Frontend** | Streamlit |
 | **Database** | SQLite / MySQL |
-| **AI/LLM** | OpenAI API (GPT-3.5-turbo) |
+| **AI/LLM** | Groq API |
 | **Visualization** | Plotly |
 | **Data Processing** | Pandas, NumPy |
 | **ORM** | SQLAlchemy |
@@ -57,18 +57,20 @@ NLytics/
 
 ## 🚀 Getting Started
 
+NLytics uses the Groq API for AI query generation. The app talks to Groq through the OpenAI-compatible Python SDK, so the codebase keeps the integration lightweight while still using Groq as the actual model provider.
+
 ### **Step 1: Install Dependencies**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### **Step 2: Configure OpenAI API Key**
+### **Step 2: Configure Groq API Key**
 
-1. Get your API key: https://platform.openai.com/api_keys
+1. Get your API key: https://console.groq.com/keys
 2. Edit `.env` file:
    ```
-   OPENAI_API_KEY=sk-your_key_here
+   GROQ_API_KEY=gsk_your_key_here
    ```
 
 ### **Step 3: Load Data into Database**
@@ -82,6 +84,8 @@ This will:
 - Create SQLite database (`nlytics.db`)
 - Create `train` table with your data
 - Show a preview
+
+If you deploy the app without a prebuilt SQLite database, the Streamlit app will try to initialize the database from the bundled `train.xlsx` file on startup.
 
 **Output should look like:**
 ```
@@ -174,7 +178,7 @@ ORDER BY month;
 
 ### **Tab 4: Settings**
 - Check database connection status
-- Verify OpenAI API configuration
+- Verify Groq API configuration
 - View database schema info
 - About NLytics
 
@@ -187,7 +191,7 @@ ORDER BY month;
 python ai.py
 ```
 
-Tests OpenAI connection and generates sample SQL.
+Tests Groq connection and generates sample SQL.
 
 ### **Inspect Database Schema**
 ```bash
@@ -224,7 +228,7 @@ python -c "from db import get_database_schema; print(get_database_schema())"
 
 - **Never commit `.env` file** - contains API keys
 - **Queries are read-only** - no data modification
-- **API calls are logged** - review your OpenAI usage regularly
+- **API calls are logged** - review your Groq usage regularly
 - **Database contains business data** - secure appropriately
 
 ---
@@ -233,20 +237,20 @@ python -c "from db import get_database_schema; print(get_database_schema())"
 
 ### **Error: "No tables found"**
 ```
-Solution: Run python load_data.py
+Solution: Run `python load_data.py` locally, or make sure `train.xlsx` is included so the app can bootstrap the database on startup.
 ```
 
-### **Error: "OpenAI API key not found"**
+### **Error: "Groq API key not found"**
 ```
 1. Edit .env file
-2. Add: OPENAI_API_KEY=sk-your_key_here
+2. Add: GROQ_API_KEY=gsk_your_key_here
 3. Reload Streamlit (press R)
 ```
 
 ### **Error: "Failed to generate SQL"**
 ```
 1. Check API key is valid
-2. Check your OpenAI account has credits
+2. Check your Groq account has limits available
 3. Try simpler question first
 ```
 
@@ -289,7 +293,7 @@ All code follows best practices:
 ## 📚 Learning Resources
 
 - **Streamlit Docs:** https://docs.streamlit.io
-- **OpenAI API:** https://platform.openai.com/docs
+- **Groq API:** https://console.groq.com/docs
 - **SQL Tutorial:** https://www.w3schools.com/sql
 - **Plotly Docs:** https://plotly.com/python
 

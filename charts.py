@@ -37,8 +37,8 @@ def detect_chart_type(df: pd.DataFrame) -> str:
     # - Default → table
     
     if num_cols == 0 and str_cols > 0:
-        # Only text/categories - show table
-        return "table"
+        # Text-only outputs still get a chart when there is more than one row.
+        return "bar" if total_rows > 1 else "table"
     
     elif num_cols == 1 and str_cols == 1 and total_rows <= 20:
         # One category, one number, few rows → bar chart
@@ -70,11 +70,14 @@ def create_bar_chart(df: pd.DataFrame, x: Optional[str] = None, y: Optional[str]
         plotly.graph_objects.Figure: Chart object
     """
     
-    # Auto-detect columns if not provided
+    # Auto-detect columns if not provided.
+    str_cols = df.select_dtypes(include=['object', 'category', 'string']).columns.tolist()
+    num_cols = df.select_dtypes(include=['number']).columns.tolist()
+
+    if not num_cols:
+        return create_frequency_bar_chart(df)
+
     if x is None or y is None:
-        str_cols = df.select_dtypes(include=['object']).columns.tolist()
-        num_cols = df.select_dtypes(include=['number']).columns.tolist()
-        
         x = x or (str_cols[0] if str_cols else df.columns[0])
         y = y or (num_cols[0] if num_cols else df.columns[1] if len(df.columns) > 1 else df.columns[0])
     
@@ -87,6 +90,36 @@ def create_bar_chart(df: pd.DataFrame, x: Optional[str] = None, y: Optional[str]
         template="plotly_white"
     )
     
+    fig.update_layout(hovermode='x unified', height=500)
+    return fig
+
+
+def create_frequency_bar_chart(df: pd.DataFrame):
+    """
+    Create a simple frequency chart from the first categorical column.
+
+    This provides a visualization even when the query output does not include
+    a numeric measure.
+    """
+
+    categorical_cols = df.select_dtypes(include=['object', 'category', 'string']).columns.tolist()
+
+    if not categorical_cols:
+        return None
+
+    label_col = categorical_cols[0]
+    counts = df[label_col].astype(str).value_counts(dropna=False).reset_index()
+    counts.columns = [label_col, 'Count']
+
+    fig = px.bar(
+        counts,
+        x=label_col,
+        y='Count',
+        title=f'Distribution of {label_col}',
+        labels={label_col: label_col.replace('_', ' ').title(), 'Count': 'Count'},
+        template='plotly_white',
+    )
+
     fig.update_layout(hovermode='x unified', height=500)
     return fig
 
@@ -198,14 +231,16 @@ def render_chart(df: pd.DataFrame, chart_type: Optional[str] = None):
     chart_type = chart_type or detect_chart_type(df)
     
     if chart_type == "bar":
-        return create_bar_chart(df)
+        chart = create_bar_chart(df)
+        return chart if chart is not None else create_frequency_bar_chart(df)
     elif chart_type == "line":
-        return create_line_chart(df)
+        chart = create_line_chart(df)
+        return chart if chart is not None else create_frequency_bar_chart(df)
     elif chart_type == "pie":
-        return create_pie_chart(df)
+        chart = create_pie_chart(df)
+        return chart if chart is not None else create_frequency_bar_chart(df)
     else:
-        # Table view
-        return create_table_display(df)
+        return create_frequency_bar_chart(df)
 
 
 if __name__ == "__main__":

@@ -10,7 +10,8 @@ from typing import List, Dict, Any
 import os
 
 # Database file path - creates nlytics.db in project root
-DATABASE_PATH = "nlytics.db"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATABASE_PATH = os.path.join(BASE_DIR, "nlytics.db")
 
 
 def get_connection():

@@ -5,6 +5,7 @@ This app gives NLytics a product-style UI: a hero banner, analytics tab,
 generated SQL view, insights panel, and schema explorer.
 """
 
+import os
 import traceback
 
 import pandas as pd
@@ -13,7 +14,12 @@ import streamlit as st
 from ai import generate_sql_from_question, validate_api_key
 from charts import detect_chart_type, render_chart
 from db import execute_query, get_database_schema, get_table_stats, table_exists
+from load_data import load_excel_to_sqlite
 from schema import get_schema_ascii_tree, get_schema_description, get_schema_diagram_mermaid
+
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TRAIN_XLSX_PATH = os.path.join(BASE_DIR, "train.xlsx")
 
 
 st.set_page_config(
@@ -488,31 +494,76 @@ def render_sidebar() -> None:
                 st.code(query_record["sql"], language="sql")
 
 
-def check_prerequisites() -> list[str]:
-    """Return any setup issues that should be shown before the app runs."""
-    issues = []
+def ensure_dataset_loaded() -> bool:
+    """Load train.xlsx into SQLite if the train table has not been created yet."""
+    if table_exists("train"):
+        return True
+
+    if not os.path.exists(TRAIN_XLSX_PATH):
+        return False
+
+    return load_excel_to_sqlite(TRAIN_XLSX_PATH, "train")
+
+
+def check_prerequisites() -> tuple[list[str], list[str]]:
+    """
+    Return (blocking_issues, warnings).
+
+    blocking_issues  – problems that prevent the app from running at all
+                       (e.g. database not loaded).
+    warnings         – non-fatal config gaps that degrade functionality
+                       (e.g. missing API key on a hosted deployment).
+    """
+    blocking: list[str] = []
+    warnings: list[str] = []
 
     if not table_exists("train"):
-        issues.append("Database not loaded. Run: python load_data.py")
+        blocking.append(
+            "Database not loaded. The app could not initialize from train.xlsx. "
+            "Run: **python load_data.py** locally or ship the dataset file with the deployment."
+        )
 
     if not validate_api_key():
-        issues.append("Groq API key not configured. Add GROQ_API_KEY to .env")
+        warnings.append(
+            "**Groq API key not configured.** "
+            "The AI query feature is disabled.\n\n"
+            "**To fix locally:** add `GROQ_API_KEY=<your-key>` to your `.env` file.\n\n"
+            "**To fix on deployment (Streamlit Cloud / Render / Railway):** "
+            "add `GROQ_API_KEY` as a platform secret / environment variable — "
+            "never commit your `.env` to the repository. "
+            "Get a free key at [console.groq.com/keys](https://console.groq.com/keys)."
+        )
 
-    return issues
+    return blocking, warnings
 
 
 def main() -> None:
     """Main application flow."""
+    dataset_bootstrapped = False
+    if not table_exists("train"):
+        dataset_bootstrapped = ensure_dataset_loaded()
+
     apply_styles()
     render_sidebar()
     render_hero()
 
-    issues = check_prerequisites()
-    if issues:
-        st.error("Setup required")
-        for issue in issues:
-            st.write(issue)
+    if dataset_bootstrapped:
+        st.success("Initialized the database from train.xlsx for this deployment.")
+
+    blocking, warnings = check_prerequisites()
+
+    # Hard stop — nothing works without the database.
+    if blocking:
+        st.error("\u26a0\ufe0f Setup required before NLytics can run:")
+        for issue in blocking:
+            st.markdown(f"- {issue}")
         st.stop()
+
+    # Soft warning — app works but AI queries are disabled.
+    api_ready = not warnings
+    if warnings:
+        for msg in warnings:
+            st.info(msg, icon="\U0001f511")
 
     tab1, tab2, tab3, tab4 = st.tabs(["Analytics", "Generated SQL", "Insights", "Schema"])
 
@@ -535,7 +586,12 @@ def main() -> None:
 
         col1, col2, col3 = st.columns([2, 1, 1])
         with col1:
-            run_query = st.button("🚀 Generate & Execute", key="run_query_btn")
+            run_query = st.button(
+                "🚀 Generate & Execute",
+                key="run_query_btn",
+                disabled=not api_ready,
+                help="Configure GROQ_API_KEY to enable AI queries." if not api_ready else None,
+            )
         with col2:
             show_schema_btn = st.button("📋 View Schema")
         with col3:
@@ -563,7 +619,7 @@ def main() -> None:
                     st.subheader("Generated SQL")
                     st.code(sql_query, language="sql")
 
-                    st.subheader("Explanation")
+                    st.subheader("Answer")
                     st.info(explanation)
 
                     result_df = execute_query(sql_query)
@@ -586,8 +642,10 @@ def main() -> None:
                     st.subheader("Visualization")
                     chart_type = detect_chart_type(result_df)
                     chart = render_chart(result_df, chart_type)
-                    if chart is not None and chart_type != "table":
+                    if chart is not None:
                         st.plotly_chart(chart, use_container_width=True)
+                    else:
+                        st.info("No chartable visualization could be generated for this result.")
 
                     st.download_button(
                         label="📥 Download as CSV",
