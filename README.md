@@ -1,4 +1,4 @@
-# 🚀 NLytics - AI Business Analytics Assistant
+# 🚀 NLytics_AI - AI Business Analytics Assistant
 
 ## 📌 Problem Statement
 
