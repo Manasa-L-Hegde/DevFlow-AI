@@ -6,6 +6,7 @@ generated SQL view, insights panel, and schema explorer.
 """
 
 import os
+import re
 import traceback
 
 import pandas as pd
@@ -505,6 +506,31 @@ def ensure_dataset_loaded() -> bool:
     return load_excel_to_sqlite(TRAIN_XLSX_PATH, "train")
 
 
+def adjust_trend_sql_for_dataset(question: str, sql_query: str) -> str:
+    """Replace current-date trend filters with dataset-relative windows when needed."""
+    question_text = question.lower()
+    sql_text = sql_query.lower()
+
+    if not any(keyword in question_text for keyword in ["trend", "monthly", "month", "last year", "last 12 months"]):
+        return sql_query
+
+    if "now" not in sql_text and "date('now'" not in sql_text and "datetime('now'" not in sql_text:
+        return sql_query
+
+    replacements = [
+        (r"(?i)date\(\s*'now'\s*,\s*'-1 year'\s*\)", "DATE((SELECT MAX(`Order_Date`) FROM `train`), '-1 year')"),
+        (r"(?i)date\(\s*'now'\s*,\s*'-12 months'\s*\)", "DATE((SELECT MAX(`Order_Date`) FROM `train`), '-12 months')"),
+        (r"(?i)datetime\(\s*'now'\s*,\s*'-1 year'\s*\)", "DATETIME((SELECT MAX(`Order_Date`) FROM `train`), '-1 year')"),
+        (r"(?i)datetime\(\s*'now'\s*,\s*'-12 months'\s*\)", "DATETIME((SELECT MAX(`Order_Date`) FROM `train`), '-12 months')"),
+    ]
+
+    adjusted_sql = sql_query
+    for pattern, replacement in replacements:
+        adjusted_sql = re.sub(pattern, replacement, adjusted_sql)
+
+    return adjusted_sql
+
+
 def check_prerequisites() -> tuple[list[str], list[str]]:
     """
     Return (blocking_issues, warnings).
@@ -615,6 +641,14 @@ def main() -> None:
                     if not sql_query:
                         st.error(explanation)
                         st.stop()
+
+                    adjusted_sql_query = adjust_trend_sql_for_dataset(user_question, sql_query)
+                    if adjusted_sql_query != sql_query:
+                        sql_query = adjusted_sql_query
+                        explanation = (
+                            f"{explanation} "
+                            "The date window was adjusted to the dataset's own timeline so the trend shows real rows."
+                        )
 
                     st.subheader("Generated SQL")
                     st.code(sql_query, language="sql")

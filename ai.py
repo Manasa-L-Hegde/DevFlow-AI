@@ -70,12 +70,13 @@ IMPORTANT RULES:
 4. Column and table names are CASE SENSITIVE - use exact names from schema
 5. Always wrap table and column names in backticks
 6. Prefer chart-friendly aggregates and rankings when the question asks for comparisons, trends, summaries, or top/bottom lists
-7. Return results in a format that can be visualized whenever possible
-8. Never hallucinate columns or tables - ONLY use what's in schema
-9. Use proper JOIN syntax if multiple tables needed
-10. For filtering, use WHERE clauses
-11. For sorting, use ORDER BY
-12. Return JSON with two keys: "sql" and "explanation"
+7. For relative time questions such as "last year" or "last 12 months", prefer the dataset's own date range using the maximum date in the table instead of the current system date
+8. Return results in a format that can be visualized whenever possible
+9. Never hallucinate columns or tables - ONLY use what's in schema
+10. Use proper JOIN syntax if multiple tables needed
+11. For filtering, use WHERE clauses
+12. For sorting, use ORDER BY
+13. Return JSON with two keys: "sql" and "explanation"
 """
     
     user_message = f"""
