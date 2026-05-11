@@ -9,6 +9,9 @@ import pandas as pd
 from typing import Optional
 
 
+TIME_LIKE_KEYWORDS = ("date", "month", "week", "year", "quarter", "time", "day")
+
+
 def detect_chart_type(df: pd.DataFrame) -> str:
     """
     Auto-detect best chart type based on DataFrame structure.
@@ -25,9 +28,15 @@ def detect_chart_type(df: pd.DataFrame) -> str:
         return "table"
     
     # Get column count and types
-    num_cols = len(df.select_dtypes(include=['number']).columns)
-    str_cols = len(df.select_dtypes(include=['object']).columns)
+    numeric_columns = df.select_dtypes(include=['number']).columns.tolist()
+    string_columns = df.select_dtypes(include=['object', 'category', 'string']).columns.tolist()
+    num_cols = len(numeric_columns)
+    str_cols = len(string_columns)
     total_rows = len(df)
+    column_names = [str(column).lower() for column in df.columns]
+    has_time_like_column = any(
+        any(keyword in column_name for keyword in TIME_LIKE_KEYWORDS) for column_name in column_names
+    )
     
     # Decision logic:
     # - Few rows with numbers → bar chart (good for comparisons)
@@ -41,8 +50,8 @@ def detect_chart_type(df: pd.DataFrame) -> str:
         return "bar" if total_rows > 1 else "table"
     
     elif num_cols == 1 and str_cols == 1 and total_rows <= 20:
-        # One category, one number, few rows → bar chart
-        return "bar"
+        # Month/date trend → line chart, otherwise bar chart for comparisons.
+        return "line" if has_time_like_column else "bar"
     
     elif num_cols >= 2 and total_rows <= 100:
         # Multiple numeric columns → line or scatter
@@ -145,9 +154,13 @@ def create_line_chart(df: pd.DataFrame, x: Optional[str] = None, y: Optional[str
     
     x = x or df.columns[0]
     y = y or num_cols[0]
+
+    chart_df = df.copy()
+    chart_df[x] = chart_df[x].astype(str)
+    chart_df = chart_df.sort_values(by=x)
     
     fig = px.line(
-        df,
+        chart_df,
         x=x,
         y=y,
         title=f"Trend: {y} over {x}",
