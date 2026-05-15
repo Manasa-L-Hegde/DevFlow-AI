@@ -6,6 +6,7 @@ generated SQL view, insights panel, schema explorer, and an Error Explainer.
 """
 
 import os
+import random
 import re
 import traceback
 
@@ -14,6 +15,7 @@ import streamlit as st
 
 from ai import generate_sql_from_question, validate_api_key
 from error_explainer import explain_error_text
+from repo_explainer import explain_repository
 from charts import detect_chart_type, render_chart
 from db import execute_query, get_database_schema, get_table_stats, table_exists
 from load_data import load_excel_to_sqlite
@@ -46,6 +48,7 @@ def apply_styles() -> None:
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syncopate:wght@400;700&display=swap');
 
+        /* ===== GLOBAL STYLES ===== */
         /* Global App Styling - Deep Cyber Violet Base */
         .stApp {
             background: linear-gradient(135deg, #05010d 0%, #0d0614 30%, #12091f 70%, #070314 100%);
@@ -62,26 +65,43 @@ def apply_styles() -> None:
             font-family: "Syncopate", sans-serif;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            margin-top: 0;
         }
 
-        /* Sidebar Styling */
+        /* Consistent Spacing Variables */
+        :root {
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 2.5rem;
+            --spacing-2xl: 3rem;
+            --spacing-3xl: 4rem;
+            --border-radius-sm: 8px;
+            --border-radius-md: 12px;
+            --border-radius-lg: 16px;
+            --border-radius-xl: 24px;
+        }
+
+        /* ===== SIDEBAR ===== */
         section[data-testid="stSidebar"] {
             background: rgba(8, 3, 15, 0.6) !important;
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
             border-right: 1px solid rgba(209, 0, 255, 0.15);
+            padding: var(--spacing-md) !important;
         }
 
-        /* Hero Section */
+        /* ===== HERO SECTION ===== */
         .nl-hero {
-            padding: 3.5rem 3rem;
+            padding: var(--spacing-2xl) var(--spacing-lg);
             border: 1px solid rgba(0, 240, 255, 0.2);
-            border-radius: 24px;
+            border-radius: var(--border-radius-xl);
             background: linear-gradient(145deg, rgba(13, 6, 20, 0.7), rgba(5, 1, 13, 0.9));
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(209, 0, 255, 0.05);
-            margin-bottom: 2.5rem;
+            margin-bottom: var(--spacing-xl);
             position: relative;
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -117,7 +137,7 @@ def apply_styles() -> None:
             letter-spacing: 0.3em;
             font-size: 0.85rem;
             font-weight: 700;
-            margin-bottom: 1rem;
+            margin-bottom: var(--spacing-sm);
             position: relative;
             z-index: 1;
             text-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
@@ -125,7 +145,7 @@ def apply_styles() -> None:
 
         .nl-title {
             font-family: 'Syncopate', sans-serif;
-            font-size: 4rem;
+            font-size: clamp(2rem, 5vw, 4rem);
             font-weight: 700;
             line-height: 1.1;
             margin: 0;
@@ -139,8 +159,8 @@ def apply_styles() -> None:
 
         .nl-subtitle {
             color: #a19fb0;
-            font-size: 1.2rem;
-            margin-top: 1.2rem;
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            margin-top: var(--spacing-md);
             max-width: 52rem;
             line-height: 1.7;
             position: relative;
@@ -148,18 +168,20 @@ def apply_styles() -> None:
             font-weight: 400;
         }
 
+        /* ===== CARDS ===== */
         /* Generic Cards */
         .nl-card {
             border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
+            border-radius: var(--border-radius-lg);
             background: rgba(13, 6, 20, 0.5);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            padding: 1.8rem;
+            padding: var(--spacing-lg);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            margin-bottom: var(--spacing-md);
         }
 
         .nl-card::after {
@@ -193,29 +215,29 @@ def apply_styles() -> None:
 
         .nl-section-title {
             font-family: 'Syncopate', sans-serif;
-            font-size: 1.1rem;
+            font-size: clamp(1rem, 2vw, 1.1rem);
             font-weight: 700;
-            margin-bottom: 0.8rem;
+            margin-bottom: var(--spacing-sm);
             color: #ffffff;
             letter-spacing: 0.05em;
         }
 
         .nl-section-copy {
             color: #a19fb0;
-            font-size: 1rem;
-            margin-bottom: 1.2rem;
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+            margin-bottom: var(--spacing-md);
             line-height: 1.6;
         }
 
-        /* Pills/Tags */
+        /* ===== PILLS/TAGS ===== */
         .nl-pill {
             display: inline-block;
             border: 1px solid rgba(209, 0, 255, 0.4);
             background: rgba(209, 0, 255, 0.1);
             color: #eabfff;
-            border-radius: 4px;
-            padding: 0.4rem 1rem;
-            margin: 0.3rem 0.4rem 0 0;
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            margin: var(--spacing-xs) var(--spacing-xs) 0 0;
             font-size: 0.85rem;
             font-weight: 600;
             text-transform: uppercase;
@@ -230,26 +252,28 @@ def apply_styles() -> None:
             color: #ffffff;
         }
 
-        /* Tabs Styling */
+        /* ===== TABS ===== */
         .stTabs [data-baseweb="tab-list"] {
-            gap: 1rem;
+            gap: var(--spacing-sm);
             background: rgba(13, 6, 20, 0.5);
             backdrop-filter: blur(10px);
-            padding: 0.5rem;
-            border-radius: 12px;
+            padding: var(--spacing-xs);
+            border-radius: var(--border-radius-md);
             border: 1px solid rgba(255, 255, 255, 0.05);
+            flex-wrap: wrap;
         }
 
         .stTabs [data-baseweb="tab"] {
             height: 3.2rem;
-            border-radius: 8px;
+            border-radius: var(--border-radius-sm);
             color: #a19fb0;
-            padding-left: 2rem;
-            padding-right: 2rem;
+            padding-left: clamp(1rem, 3vw, 2rem);
+            padding-right: clamp(1rem, 3vw, 2rem);
             font-weight: 600;
             font-family: 'Syncopate', sans-serif;
-            font-size: 0.9rem;
+            font-size: clamp(0.75rem, 1.5vw, 0.9rem);
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .stTabs [data-baseweb="tab"]:hover {
@@ -265,16 +289,17 @@ def apply_styles() -> None:
             box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
         }
 
-        /* Metric Widgets */
+        /* ===== METRICS ===== */
         div[data-testid="stMetric"] {
             background: rgba(13, 6, 20, 0.6);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 1.2rem 1.5rem;
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-md) var(--spacing-lg);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border-left: 3px solid #d100ff;
+            margin-bottom: var(--spacing-sm);
         }
         
         div[data-testid="stMetric"]:hover {
@@ -296,18 +321,18 @@ def apply_styles() -> None:
             font-family: 'Syncopate', sans-serif;
             font-weight: 700;
             color: #ffffff;
-            font-size: 2.2rem;
+            font-size: clamp(1.5rem, 3vw, 2.2rem);
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
 
-        /* Input Fields */
+        /* ===== INPUT FIELDS ===== */
         .stTextInput > div > div > input {
             background: rgba(8, 3, 15, 0.8) !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
             color: #ffffff !important;
-            border-radius: 8px !important;
-            padding: 1.2rem !important;
-            font-size: 1.1rem !important;
+            border-radius: var(--border-radius-sm) !important;
+            padding: var(--spacing-md) !important;
+            font-size: clamp(1rem, 2vw, 1.1rem) !important;
             transition: all 0.3s ease !important;
             box-shadow: inset 0 2px 5px rgba(0,0,0,0.5) !important;
         }
@@ -317,20 +342,22 @@ def apply_styles() -> None:
             box-shadow: 0 0 0 1px #00f0ff, 0 0 15px rgba(0, 240, 255, 0.3), inset 0 2px 5px rgba(0,0,0,0.5) !important;
         }
 
-        /* Buttons */
+        /* ===== BUTTONS ===== */
         .stButton > button {
-            border-radius: 8px !important;
+            border-radius: var(--border-radius-sm) !important;
             font-family: 'Syncopate', sans-serif !important;
             font-weight: 700 !important;
             text-transform: uppercase !important;
             letter-spacing: 0.05em !important;
-            padding: 0.6rem 1.2rem !important;
+            padding: var(--spacing-sm) var(--spacing-md) !important;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
             border: 1px solid rgba(0, 240, 255, 0.3) !important;
             background: linear-gradient(90deg, rgba(0, 240, 255, 0.1), rgba(209, 0, 255, 0.1)) !important;
             color: #ffffff !important;
             position: relative;
             overflow: hidden;
+            min-height: 2.5rem;
+            font-size: clamp(0.75rem, 1.5vw, 0.9rem) !important;
         }
 
         .stButton > button::before {
@@ -360,21 +387,272 @@ def apply_styles() -> None:
             box-shadow: 0 0 20px rgba(209, 0, 255, 0.5) !important;
         }
 
-        /* Code blocks */
+        /* ===== CODE BLOCKS & DATAFRAMES ===== */
         .stCodeBlock {
-            border-radius: 12px !important;
+            border-radius: var(--border-radius-md) !important;
             overflow: hidden !important;
             border: 1px solid rgba(0, 240, 255, 0.15) !important;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
             background: #05010d !important;
+            margin-bottom: var(--spacing-md) !important;
         }
         
-        /* Dataframes */
         [data-testid="stDataFrame"] {
-            border-radius: 12px !important;
+            border-radius: var(--border-radius-md) !important;
             overflow: hidden !important;
             border: 1px solid rgba(209, 0, 255, 0.15) !important;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+            margin-bottom: var(--spacing-md) !important;
+        }
+
+        /* ===== QUICK ACTIONS ===== */
+        .qa-container {
+            margin: var(--spacing-xl) 0;
+        }
+
+        .qa-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .qa-card {
+            border: 1px solid rgba(0, 240, 255, 0.15);
+            border-radius: var(--border-radius-lg);
+            background: linear-gradient(145deg, rgba(13, 6, 20, 0.7), rgba(5, 1, 13, 0.9));
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: var(--spacing-lg);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .qa-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #00f0ff, #d100ff);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .qa-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(0, 240, 255, 0.4);
+            box-shadow: 0 20px 50px rgba(0, 240, 255, 0.2), 0 0 30px rgba(209, 0, 255, 0.15);
+        }
+
+        .qa-card:hover::before {
+            opacity: 1;
+        }
+
+        .qa-icon {
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            margin-bottom: var(--spacing-sm);
+            display: block;
+            filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.3));
+        }
+
+        .qa-title {
+            font-family: 'Syncopate', sans-serif;
+            font-size: clamp(0.95rem, 2vw, 1.1rem);
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: var(--spacing-sm);
+            letter-spacing: 0.05em;
+        }
+
+        .qa-description {
+            color: #a19fb0;
+            font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+            line-height: 1.6;
+            margin-bottom: var(--spacing-md);
+            flex-grow: 1;
+        }
+
+        .qa-button {
+            display: inline-block;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: linear-gradient(90deg, rgba(0, 240, 255, 0.1), rgba(209, 0, 255, 0.1));
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: var(--border-radius-sm);
+            color: #00f0ff;
+            font-size: clamp(0.75rem, 1.5vw, 0.85rem);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .qa-button:hover {
+            background: linear-gradient(90deg, rgba(0, 240, 255, 0.2), rgba(209, 0, 255, 0.2));
+            border-color: #00f0ff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+            color: #ffffff;
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        /* Tablet and below */
+        @media (max-width: 768px) {
+            .nl-hero {
+                padding: var(--spacing-lg) var(--spacing-md);
+                margin-bottom: var(--spacing-lg);
+            }
+
+            .nl-title {
+                font-size: 2.5rem;
+            }
+
+            .nl-subtitle {
+                font-size: 1rem;
+            }
+
+            .qa-grid {
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                gap: var(--spacing-sm);
+            }
+
+            .qa-card {
+                padding: var(--spacing-md);
+            }
+
+            .stTabs [data-baseweb="tab"] {
+                padding-left: var(--spacing-sm);
+                padding-right: var(--spacing-sm);
+                font-size: 0.75rem;
+            }
+
+            div[data-testid="stMetric"] {
+                padding: var(--spacing-sm) var(--spacing-md);
+            }
+
+            .nl-card {
+                padding: var(--spacing-md);
+            }
+
+            section[data-testid="stSidebar"] {
+                padding: var(--spacing-sm) !important;
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 480px) {
+            .nl-hero {
+                padding: var(--spacing-md) var(--spacing-sm);
+                border-radius: var(--border-radius-md);
+            }
+
+            .nl-title {
+                font-size: 2rem;
+            }
+
+            .nl-kicker {
+                font-size: 0.7rem;
+                letter-spacing: 0.2em;
+            }
+
+            .nl-subtitle {
+                font-size: 0.9rem;
+                margin-top: var(--spacing-sm);
+            }
+
+            .qa-grid {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-sm);
+            }
+
+            .qa-card {
+                padding: var(--spacing-sm);
+            }
+
+            .qa-icon {
+                font-size: 1.8rem;
+            }
+
+            .stTabs [data-baseweb="tab-list"] {
+                gap: var(--spacing-xs);
+                padding: var(--spacing-xs);
+            }
+
+            .stTabs [data-baseweb="tab"] {
+                height: 2.5rem;
+                padding-left: var(--spacing-xs);
+                padding-right: var(--spacing-xs);
+                font-size: 0.7rem;
+            }
+
+            .stButton > button {
+                padding: var(--spacing-xs) var(--spacing-sm) !important;
+                font-size: 0.75rem !important;
+                min-height: 2rem;
+            }
+
+            div[data-testid="stMetric"] {
+                padding: var(--spacing-xs) var(--spacing-sm);
+            }
+
+            div[data-testid="stMetricValue"] {
+                font-size: 1.5rem;
+            }
+
+            .nl-card {
+                padding: var(--spacing-sm);
+                border-radius: var(--border-radius-md);
+            }
+
+            .nl-section-title {
+                font-size: 0.95rem;
+            }
+
+            .nl-section-copy {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Large screens - optimize spacing */
+        @media (min-width: 1400px) {
+            .qa-grid {
+                gap: var(--spacing-lg);
+            }
+
+            .nl-hero {
+                padding: var(--spacing-3xl) var(--spacing-2xl);
+            }
+        }
+
+        /* Ensure proper column spacing in Streamlit */
+        .row-widget.stHorizontal {
+            gap: var(--spacing-md) !important;
+        }
+
+        /* Fix button container width issues */
+        .stButton {
+            width: 100%;
+        }
+
+        /* Improve expander spacing */
+        .streamlit-expanderHeader {
+            border-radius: var(--border-radius-sm) !important;
+            padding: var(--spacing-sm) var(--spacing-md) !important;
+        }
+
+        /* Better alert/info box spacing */
+        .stAlert {
+            margin-bottom: var(--spacing-md) !important;
+            border-radius: var(--border-radius-md) !important;
+            padding: var(--spacing-md) !important;
         }
         </style>
         """,
@@ -396,6 +674,117 @@ def render_hero() -> None:
         """,
         unsafe_allow_html=True,
     )
+
+
+def render_quick_actions() -> None:
+    """Render Quick Actions section with sample prompts for common tasks."""
+    st.markdown(
+        """
+        <div class="qa-container">
+            <div class="nl-card nl-card-strong">
+                <div class="nl-section-title">Quick Actions</div>
+                <div class="nl-section-copy">Jump-start your workflow with these common developer tasks</div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    
+    # Sample prompt pools for dynamic rotation
+    python_errors = [
+        "AttributeError: 'NoneType' object has no attribute 'split'",
+        "KeyError: 'user_id' not found in dictionary",
+        "TypeError: unsupported operand type(s) for +: 'int' and 'str'",
+        "IndexError: list index out of range",
+        "ModuleNotFoundError: No module named 'requests'",
+        "ValueError: invalid literal for int() with base 10: 'abc'",
+        "FileNotFoundError: [Errno 2] No such file or directory: 'data.csv'"
+    ]
+    
+    sql_queries = [
+        "What are the top 10 products by sales?",
+        "Show monthly revenue trends for the last year",
+        "Which customers have the highest lifetime value?",
+        "Compare sales performance across different regions",
+        "What is the average order value by product category?",
+        "Find products with declining sales in the last quarter",
+        "Show customer retention rate by month"
+    ]
+    
+    readme_prompts = [
+        "Generate a README for a Python data analysis project",
+        "Create documentation for a Streamlit dashboard application",
+        "Write a README for a machine learning model training pipeline",
+        "Generate README for a developer productivity tool",
+        "Create documentation for a REST API backend service",
+        "Write a README for a data visualization library"
+    ]
+    
+    repo_examples = [
+        "Explain the architecture of streamlit/streamlit repository",
+        "Analyze the structure of pandas-dev/pandas codebase",
+        "Describe the organization of microsoft/vscode repository",
+        "Explain the architecture of langchain-ai/langchain project",
+        "Analyze the structure of this DevFlow AI application",
+        "Describe the organization of fastapi/fastapi repository"
+    ]
+    
+    # Define quick action cards with dynamic prompts
+    actions = [
+        {
+            "icon": "🐍",
+            "title": "Explain Python Error",
+            "description": "Paste a Python traceback and get instant debugging guidance",
+            "prompt": random.choice(python_errors),
+            "tab": 4  # Error Explainer tab
+        },
+        {
+            "icon": "💾",
+            "title": "Generate SQL Query",
+            "description": "Ask a question in plain English and get executable SQL",
+            "prompt": random.choice(sql_queries),
+            "tab": 0  # Analytics tab
+        },
+        {
+            "icon": "📝",
+            "title": "Generate README",
+            "description": "Create professional documentation for your project",
+            "prompt": random.choice(readme_prompts),
+            "tab": 4  # Error Explainer tab (can be used for general AI tasks)
+        },
+        {
+            "icon": "🔍",
+            "title": "Explain Repository",
+            "description": "Get insights about codebase structure and architecture",
+            "prompt": random.choice(repo_examples),
+            "tab": 4  # Error Explainer tab
+        }
+    ]
+    
+    # Create grid layout
+    cols = st.columns(4)
+    
+    for idx, action in enumerate(actions):
+        with cols[idx]:
+            st.markdown(
+                f"""
+                <div class="qa-card">
+                    <span class="qa-icon">{action['icon']}</span>
+                    <div class="qa-title">{action['title']}</div>
+                    <div class="qa-description">{action['description']}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            
+            # Add button to use sample prompt
+            if st.button(f"Try Sample", key=f"qa_btn_{idx}", use_container_width=True):
+                if action['tab'] == 0:
+                    st.session_state['user_question'] = action['prompt']
+                    st.info(f"Sample prompt loaded: '{action['prompt']}' - Go to Analytics tab to execute!")
+                elif action['tab'] == 4:
+                    st.session_state['error_trace'] = action['prompt']
+                    st.info(f"Sample prompt loaded: '{action['prompt']}' - Go to Error Explainer tab to analyze!")
 
 
 def build_schema_cards(schema: dict) -> str:
@@ -572,6 +961,7 @@ def main() -> None:
     apply_styles()
     render_sidebar()
     render_hero()
+    render_quick_actions()
 
     if dataset_bootstrapped:
         st.success("Initialized the database from train.xlsx for this deployment.")
@@ -591,7 +981,7 @@ def main() -> None:
         for msg in warnings:
             st.info(msg, icon="\U0001f511")
 
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Analytics", "Generated SQL", "Insights", "Schema", "Error Explainer"])
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Analytics", "Generated SQL", "Insights", "Schema", "Error Explainer", "Repository Explainer"])
 
     with tab1:
         st.markdown(
@@ -815,6 +1205,138 @@ def main() -> None:
                         explanation = explain_error_text(trace_text)
                         st.subheader("Explanation")
                         st.info(explanation)
+
+
+    with tab6:
+        st.markdown(
+            """
+            <div class='nl-card nl-card-strong'>
+                <div class='nl-section-title'>Repository Explainer</div>
+                <div class='nl-section-copy'>Analyze any GitHub repository to understand its architecture, tech stack, and get AI-powered improvement suggestions.</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        repo_url = st.text_input(
+            "Enter GitHub Repository URL:",
+            placeholder="https://github.com/username/repository",
+            key="repo_url_input",
+            help="Enter a public GitHub repository URL to analyze"
+        )
+
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            analyze_btn = st.button("🔍 Analyze Repository", key="analyze_repo_btn", disabled=not api_ready)
+        with col2:
+            if not api_ready:
+                st.caption("⚠️ Configure GROQ_API_KEY to enable repository analysis")
+            else:
+                st.caption("DevFlow AI will analyze the repository structure and provide comprehensive insights")
+
+        if analyze_btn:
+            if not repo_url:
+                st.warning("Please enter a GitHub repository URL first.")
+            else:
+                with st.spinner("Fetching repository information..."):
+                    success, message, repo_info, analysis = explain_repository(repo_url)
+                    
+                    if not success:
+                        st.error(f"❌ {message}")
+                    else:
+                        st.success(f"✅ {message}")
+                        
+                        # Display repository metadata
+                        if repo_info:
+                            st.write("---")
+                            st.subheader("📊 Repository Overview")
+                            
+                            col1, col2, col3, col4 = st.columns(4)
+                            with col1:
+                                st.metric("⭐ Stars", f"{repo_info['stars']:,}")
+                            with col2:
+                                st.metric("🔱 Forks", f"{repo_info['forks']:,}")
+                            with col3:
+                                st.metric("🐛 Open Issues", f"{repo_info['open_issues']:,}")
+                            with col4:
+                                st.metric("💻 Primary Language", repo_info['language'] or "N/A")
+                            
+                            if repo_info['description']:
+                                st.markdown(
+                                    f"""
+                                    <div class='nl-card'>
+                                        <div class='nl-section-title'>Description</div>
+                                        <div class='nl-section-copy'>{repo_info['description']}</div>
+                                    </div>
+                                    """,
+                                    unsafe_allow_html=True,
+                                )
+                            
+                            if repo_info['topics']:
+                                st.markdown("**Topics:**")
+                                topics_html = "".join([f"<span class='nl-pill'>{topic}</span>" for topic in repo_info['topics']])
+                                st.markdown(topics_html, unsafe_allow_html=True)
+                        
+                        # Display AI analysis
+                        if analysis:
+                            st.write("---")
+                            st.subheader("🤖 AI-Powered Analysis")
+                            
+                            # Project Summary
+                            st.markdown(
+                                f"""
+                                <div class='nl-card nl-card-strong'>
+                                    <div class='nl-section-title'>📝 Project Summary</div>
+                                    <div class='nl-section-copy'>{analysis.get('summary', 'No summary available')}</div>
+                                </div>
+                                """,
+                                unsafe_allow_html=True,
+                            )
+                            
+                            # Architecture Explanation
+                            st.markdown(
+                                f"""
+                                <div class='nl-card'>
+                                    <div class='nl-section-title'>🏗️ Architecture Explanation</div>
+                                    <div class='nl-section-copy'>{analysis.get('architecture', 'No architecture details available')}</div>
+                                </div>
+                                """,
+                                unsafe_allow_html=True,
+                            )
+                            
+                            # Tech Stack
+                            if analysis.get('tech_stack'):
+                                st.markdown("### 💻 Detected Tech Stack")
+                                tech_cols = st.columns(3)
+                                for idx, tech in enumerate(analysis['tech_stack']):
+                                    with tech_cols[idx % 3]:
+                                        st.markdown(f"<span class='nl-pill'>{tech}</span>", unsafe_allow_html=True)
+                            
+                            # Improvements
+                            if analysis.get('improvements'):
+                                st.markdown("### 🚀 Possible Improvements")
+                                for idx, improvement in enumerate(analysis['improvements'], 1):
+                                    st.markdown(
+                                        f"""
+                                        <div class='nl-card'>
+                                            <div class='nl-section-copy'><strong>{idx}.</strong> {improvement}</div>
+                                        </div>
+                                        """,
+                                        unsafe_allow_html=True,
+                                    )
+                            
+                            # Productivity Insights
+                            if analysis.get('productivity_insights'):
+                                st.markdown("### ⚡ Developer Productivity Insights")
+                                for idx, insight in enumerate(analysis['productivity_insights'], 1):
+                                    st.markdown(
+                                        f"""
+                                        <div class='nl-card'>
+                                            <div class='nl-section-copy'><strong>{idx}.</strong> {insight}</div>
+                                        </div>
+                                        """,
+                                        unsafe_allow_html=True,
+                                    )
 
 
 if __name__ == "__main__":
