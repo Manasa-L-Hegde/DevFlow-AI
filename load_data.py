@@ -1,6 +1,6 @@
 """
 Data Loading Module
-Loads train.xlsx into SQLite database for NLytics
+Loads train.xlsx into SQLite database for DevFlow AI
 Run this ONCE before starting the app
 """
 
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     # Usage: python load_data.py
     
     print("=" * 50)
-    print("NLytics Data Loader")
+    print("DevFlow AI Data Loader")
     print("=" * 50)
     
     success = load_excel_to_sqlite("train.xlsx", "train")

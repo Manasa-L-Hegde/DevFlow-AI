@@ -1,6 +1,6 @@
 """
 Database Connection & Management Module
-Handles all SQLite database operations for NLytics
+Handles SQLite database operations for DevFlow AI
 """
 
 import sqlite3
@@ -9,9 +9,9 @@ from sqlalchemy import create_engine, inspect
 from typing import List, Dict, Any
 import os
 
-# Database file path - creates nlytics.db in project root
+# Database file path - creates devflow.db in project root
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATABASE_PATH = os.path.join(BASE_DIR, "nlytics.db")
+DATABASE_PATH = os.path.join(BASE_DIR, "devflow.db")
 
 
 def get_connection():

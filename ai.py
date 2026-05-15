@@ -22,8 +22,7 @@ load_dotenv(ENV_PATH)
 
 
 def get_openai_client():
-    """
-    Create an OpenAI-compatible client configured for Groq.
+    """Create an OpenAI-compatible client configured for Groq.
 
     Returns:
         OpenAI | None: Configured client or None if the SDK/key is missing.
@@ -57,9 +56,9 @@ def generate_sql_from_question(question: str) -> Tuple[str, str]:
     schema_info = get_schema_for_prompt()
     
     # Build the prompt for Groq
-    system_prompt = f"""You are an expert SQL data analyst and AI assistant for NLytics.
+    system_prompt = f"""You are an expert SQL data analyst and developer assistant for DevFlow AI.
 
-Your task is to convert natural language business questions into precise SQLite SQL queries and provide clear, professional explanations.
+Your task is to convert natural language developer and data questions into precise SQLite SQL queries and provide clear, professional explanations that are useful for debugging and developer workflows.
 
 {schema_info}
 
@@ -176,18 +175,18 @@ def validate_api_key() -> bool:
 
 if __name__ == "__main__":
     # Test the AI module
-    print("Testing NLytics AI Module...")
-    
+    print("Testing DevFlow AI module...")
+
     if not validate_api_key():
         print("❌ Error: GROQ_API_KEY not set in .env file")
         print("Get your key from: https://console.groq.com/keys")
     else:
         print("✅ API key is configured")
-        
+
         # Test with a sample question
         question = "How many records are in the dataset?"
         print(f"\nTest Question: {question}")
-        
+
         sql, explanation = generate_sql_from_question(question)
         print(f"\nGenerated SQL:\n{sql}")
         print(f"\nExplanation:\n{explanation}")

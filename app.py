@@ -1,8 +1,8 @@
 """
-Main Streamlit application for NLytics.
+Main Streamlit application for DevFlow AI.
 
-This app gives NLytics a product-style UI: a hero banner, analytics tab,
-generated SQL view, insights panel, and schema explorer.
+This app provides a developer-focused UI: a hero banner, analytics tab,
+generated SQL view, insights panel, schema explorer, and an Error Explainer.
 """
 
 import os
@@ -13,6 +13,7 @@ import pandas as pd
 import streamlit as st
 
 from ai import generate_sql_from_question, validate_api_key
+from error_explainer import explain_error_text
 from charts import detect_chart_type, render_chart
 from db import execute_query, get_database_schema, get_table_stats, table_exists
 from load_data import load_excel_to_sqlite
@@ -24,7 +25,7 @@ TRAIN_XLSX_PATH = os.path.join(BASE_DIR, "train.xlsx")
 
 
 st.set_page_config(
-    page_title="NLytics - AI Analytics",
+    page_title="DevFlow AI - AI-powered developer productivity assistant",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -385,11 +386,11 @@ def render_hero() -> None:
     st.markdown(
         """
         <div class="nl-hero">
-            <div class="nl-kicker">AI-powered analytics copilot</div>
-            <h1 class="nl-title">NLytics</h1>
+            <div class="nl-kicker">AI-powered developer productivity assistant</div>
+            <h1 class="nl-title">DevFlow AI</h1>
             <div class="nl-subtitle">
-                Ask business questions in plain English, convert them into SQL, execute live against the database,
-                and turn the result into charts, schema context, and decision-ready insights.
+                Paste stack traces, SQL errors, or Python tracebacks and get plain-English explanations,
+                targeted debugging steps, and suggested fixes — alongside SQL generation and visualization.
             </div>
         </div>
         """,
@@ -452,13 +453,12 @@ def generate_local_insight(df: pd.DataFrame) -> str:
 
 
 def render_sidebar() -> None:
-    st.sidebar.title("📊 NLytics")
+    st.sidebar.title("⚙️ DevFlow AI")
     st.sidebar.markdown(
         """
-        **AI-Powered Business Analytics**
+        **AI-powered developer workflow assistant**
 
-        Convert natural language to SQL instantly.
-        Get insights in seconds.
+        Explain errors, generate SQL, and accelerate debugging.
         """
     )
 
@@ -580,7 +580,7 @@ def main() -> None:
 
     # Hard stop — nothing works without the database.
     if blocking:
-        st.error("\u26a0\ufe0f Setup required before NLytics can run:")
+        st.error("\u26a0\ufe0f Setup required before DevFlow AI can run:")
         for issue in blocking:
             st.markdown(f"- {issue}")
         st.stop()
@@ -591,7 +591,7 @@ def main() -> None:
         for msg in warnings:
             st.info(msg, icon="\U0001f511")
 
-    tab1, tab2, tab3, tab4 = st.tabs(["Analytics", "Generated SQL", "Insights", "Schema"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Analytics", "Generated SQL", "Insights", "Schema", "Error Explainer"])
 
     with tab1:
         st.markdown(
@@ -782,6 +782,39 @@ def main() -> None:
             st.write("---")
             with st.expander("Schema description", expanded=False):
                 st.text(get_schema_description())
+
+        with tab5:
+            st.markdown(
+                """
+                <div class='nl-card nl-card-strong'>
+                    <div class='nl-section-title'>Error Explainer</div>
+                    <div class='nl-section-copy'>Paste a stack trace, SQL error, or traceback and get a plain-English explanation and debugging steps.</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+            trace_text = st.text_area(
+                "Paste stack trace or error message:",
+                height=200,
+                placeholder="Example: Traceback (most recent call last): ...",
+                key="error_trace",
+            )
+
+            col1, col2 = st.columns([1, 3])
+            with col1:
+                explain_btn = st.button("🛠️ Explain Error", key="explain_error_btn")
+            with col2:
+                st.caption("DevFlow AI will summarize the error and suggest targeted debugging steps.")
+
+            if explain_btn:
+                if not trace_text:
+                    st.warning("Please paste an error or traceback first.")
+                else:
+                    with st.spinner("Analyzing error with AI..."):
+                        explanation = explain_error_text(trace_text)
+                        st.subheader("Explanation")
+                        st.info(explanation)
 
 
 if __name__ == "__main__":
