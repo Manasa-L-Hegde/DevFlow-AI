@@ -503,6 +503,469 @@ def apply_styles() -> None:
             color: #ffffff;
         }
 
+        /* ===== AI WORKFLOW SUMMARY ===== */
+        .workflow-summary {
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            border-radius: var(--border-radius-lg);
+            background: linear-gradient(145deg, rgba(0, 240, 255, 0.03), rgba(209, 0, 255, 0.03));
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.1), inset 0 0 20px rgba(0, 240, 255, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .workflow-summary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #00f0ff, #d100ff, transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .workflow-summary-title {
+            font-family: 'Syncopate', sans-serif;
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            font-weight: 700;
+            color: #00f0ff;
+            margin-bottom: var(--spacing-md);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .workflow-summary-title::before {
+            content: '🤖';
+            font-size: 1.5rem;
+            filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.5));
+        }
+
+        .workflow-section {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .workflow-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .workflow-section-header {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+            font-weight: 600;
+            color: #d100ff;
+            margin-bottom: var(--spacing-xs);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .workflow-section-content {
+            color: #e2e8f0;
+            font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+            line-height: 1.7;
+            padding-left: var(--spacing-lg);
+        }
+
+        .workflow-section-content ul {
+            margin: 0;
+            padding-left: var(--spacing-md);
+            list-style: none;
+        }
+
+        .workflow-section-content li {
+            position: relative;
+            padding-left: var(--spacing-md);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .workflow-section-content li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #00f0ff;
+            font-weight: bold;
+        }
+
+        .workflow-badge {
+            display: inline-block;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #00f0ff;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: var(--spacing-sm);
+        }
+
+        /* ===== AI PRODUCTIVITY SCORE ===== */
+        .productivity-score-card {
+            border: 2px solid rgba(0, 240, 255, 0.3);
+            border-radius: var(--border-radius-xl);
+            background: linear-gradient(145deg, rgba(13, 6, 20, 0.9), rgba(5, 1, 13, 0.95));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: var(--spacing-2xl);
+            margin: var(--spacing-xl) 0;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 240, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .productivity-score-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00f0ff, #d100ff, #00f0ff);
+            border-radius: var(--border-radius-xl);
+            z-index: -1;
+            opacity: 0.5;
+            animation: rotateBorder 4s linear infinite;
+        }
+
+        @keyframes rotateBorder {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .score-header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .score-title {
+            font-family: 'Syncopate', sans-serif;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-weight: 700;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--spacing-sm);
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+        }
+
+        .score-subtitle {
+            color: #a19fb0;
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+        }
+
+        .score-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: var(--spacing-xl) auto;
+            position: relative;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: radial-gradient(circle, rgba(13, 6, 20, 0.8), rgba(5, 1, 13, 0.9));
+            border: 3px solid;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .score-circle.excellent {
+            border-color: #00ff88;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.6), inset 0 0 30px rgba(0, 255, 136, 0.1);
+        }
+
+        .score-circle.good {
+            border-color: #00f0ff;
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.6), inset 0 0 30px rgba(0, 240, 255, 0.1);
+        }
+
+        .score-circle.moderate {
+            border-color: #ffcc00;
+            box-shadow: 0 0 40px rgba(255, 204, 0, 0.6), inset 0 0 30px rgba(255, 204, 0, 0.1);
+        }
+
+        .score-circle.needs-improvement {
+            border-color: #ff3366;
+            box-shadow: 0 0 40px rgba(255, 51, 102, 0.6), inset 0 0 30px rgba(255, 51, 102, 0.1);
+        }
+
+        .score-number {
+            font-family: 'Syncopate', sans-serif;
+            font-size: clamp(3rem, 8vw, 4.5rem);
+            font-weight: 700;
+            line-height: 1;
+            margin: 0;
+        }
+
+        .score-circle.excellent .score-number {
+            color: #00ff88;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.8);
+        }
+
+        .score-circle.good .score-number {
+            color: #00f0ff;
+            text-shadow: 0 0 30px rgba(0, 240, 255, 0.8);
+        }
+
+        .score-circle.moderate .score-number {
+            color: #ffcc00;
+            text-shadow: 0 0 30px rgba(255, 204, 0, 0.8);
+        }
+
+        .score-circle.needs-improvement .score-number {
+            color: #ff3366;
+            text-shadow: 0 0 30px rgba(255, 51, 102, 0.8);
+        }
+
+        .score-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-top: var(--spacing-xs);
+        }
+
+        .score-circle.excellent .score-label {
+            color: #00ff88;
+        }
+
+        .score-circle.good .score-label {
+            color: #00f0ff;
+        }
+
+        .score-circle.moderate .score-label {
+            color: #ffcc00;
+        }
+
+        .score-circle.needs-improvement .score-label {
+            color: #ff3366;
+        }
+
+        .score-dimensions {
+            margin-top: var(--spacing-2xl);
+            display: grid;
+            gap: var(--spacing-md);
+        }
+
+        .dimension-item {
+            background: rgba(13, 6, 20, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md);
+            transition: all 0.3s ease;
+        }
+
+        .dimension-item:hover {
+            background: rgba(20, 9, 30, 0.7);
+            border-color: rgba(0, 240, 255, 0.3);
+            transform: translateX(5px);
+        }
+
+        .dimension-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .dimension-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .dimension-score {
+            font-family: 'Syncopate', sans-serif;
+            font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: var(--border-radius-sm);
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+        }
+
+        .dimension-score.excellent { color: #00ff88; border-color: #00ff88; background: rgba(0, 255, 136, 0.1); }
+        .dimension-score.good { color: #00f0ff; border-color: #00f0ff; background: rgba(0, 240, 255, 0.1); }
+        .dimension-score.moderate { color: #ffcc00; border-color: #ffcc00; background: rgba(255, 204, 0, 0.1); }
+        .dimension-score.needs-improvement { color: #ff3366; border-color: #ff3366; background: rgba(255, 51, 102, 0.1); }
+
+        .dimension-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .dimension-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dimension-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmerBar 2s infinite;
+        }
+
+        @keyframes shimmerBar {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .dimension-bar-fill.excellent {
+            background: linear-gradient(90deg, #00ff88, #00cc6a);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .dimension-bar-fill.good {
+            background: linear-gradient(90deg, #00f0ff, #00b8cc);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+
+        .dimension-bar-fill.moderate {
+            background: linear-gradient(90deg, #ffcc00, #cc9900);
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+
+        .dimension-bar-fill.needs-improvement {
+            background: linear-gradient(90deg, #ff3366, #cc0033);
+            box-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+        }
+
+        .score-suggestions {
+            margin-top: var(--spacing-xl);
+            padding: var(--spacing-lg);
+            background: rgba(0, 240, 255, 0.03);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: var(--border-radius-md);
+        }
+
+        .suggestions-title {
+            font-family: 'Syncopate', sans-serif;
+            font-size: clamp(0.95rem, 2vw, 1.1rem);
+            font-weight: 700;
+            color: #00f0ff;
+            margin-bottom: var(--spacing-sm);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .suggestions-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .suggestions-list li {
+            color: #e2e8f0;
+            font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+            line-height: 1.7;
+            padding-left: var(--spacing-lg);
+            margin-bottom: var(--spacing-xs);
+            position: relative;
+        }
+
+        .suggestions-list li::before {
+            content: '💡';
+            position: absolute;
+            left: 0;
+            filter: drop-shadow(0 0 5px rgba(255, 204, 0, 0.5));
+        }
+
+        .score-badge-compact {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--border-radius-sm);
+            font-family: 'Syncopate', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 1px solid;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .score-badge-compact.excellent {
+            background: rgba(0, 255, 136, 0.1);
+            border-color: #00ff88;
+            color: #00ff88;
+        }
+
+        .score-badge-compact.good {
+            background: rgba(0, 240, 255, 0.1);
+            border-color: #00f0ff;
+            color: #00f0ff;
+        }
+
+        .score-badge-compact.moderate {
+            background: rgba(255, 204, 0, 0.1);
+            border-color: #ffcc00;
+            color: #ffcc00;
+        }
+
+        .score-badge-compact.needs-improvement {
+            background: rgba(255, 51, 102, 0.1);
+            border-color: #ff3366;
+            color: #ff3366;
+        }
+
+        .score-badge-compact:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px currentColor;
+        }
+
         /* ===== RESPONSIVE DESIGN ===== */
         /* Tablet and below */
         @media (max-width: 768px) {
@@ -841,6 +1304,493 @@ def generate_local_insight(df: pd.DataFrame) -> str:
     return "This result is primarily categorical. Use the schema and filters to drill deeper into patterns."
 
 
+def render_workflow_summary(
+    context_type: str,
+    insights: list[str],
+    actions: list[str],
+    next_steps: list[str],
+    badge_text: str = "AI Copilot"
+) -> None:
+    """
+    Render an AI Workflow Summary component with key insights, actions, and next steps.
+    
+    Args:
+        context_type: Type of analysis (e.g., "Error Analysis", "Repository Analysis", "SQL Query")
+        insights: List of key insights (2-3 items)
+        actions: List of suggested actions (2-3 items)
+        next_steps: List of next steps or productivity recommendations (2-3 items)
+        badge_text: Text for the badge (default: "AI Copilot")
+    """
+    insights_html = "".join([f"<li>{insight}</li>" for insight in insights])
+    actions_html = "".join([f"<li>{action}</li>" for action in actions])
+    next_steps_html = "".join([f"<li>{step}</li>" for step in next_steps])
+    
+    summary_html = f"""
+    <div class="workflow-summary">
+        <div class="workflow-summary-title">AI Workflow Summary</div>
+        
+        <div class="workflow-section">
+            <div class="workflow-section-header">🎯 Key Insights</div>
+            <div class="workflow-section-content">
+                <ul>{insights_html}</ul>
+            </div>
+        </div>
+        
+        <div class="workflow-section">
+            <div class="workflow-section-header">🚀 Suggested Actions</div>
+            <div class="workflow-section-content">
+                <ul>{actions_html}</ul>
+            </div>
+        </div>
+        
+        <div class="workflow-section">
+            <div class="workflow-section-header">💡 Next Steps</div>
+            <div class="workflow-section-content">
+                <ul>{next_steps_html}</ul>
+            </div>
+        </div>
+        
+        <span class="workflow-badge">{badge_text}</span>
+    </div>
+    """
+    
+    st.markdown(summary_html, unsafe_allow_html=True)
+
+
+def extract_error_workflow_insights(explanation: str) -> tuple[list[str], list[str], list[str]]:
+    """Extract workflow insights from error explanation text."""
+    insights = []
+    actions = []
+    next_steps = []
+    
+    # Parse the explanation to extract structured information
+    lines = explanation.split('\n')
+    current_section = None
+    
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+            
+        # Detect sections
+        if 'summary' in line.lower() or 'what' in line.lower():
+            current_section = 'insights'
+        elif 'cause' in line.lower() or 'why' in line.lower():
+            current_section = 'insights'
+        elif 'debug' in line.lower() or 'step' in line.lower() or 'fix' in line.lower():
+            current_section = 'actions'
+        elif 'suggest' in line.lower() or 'recommend' in line.lower():
+            current_section = 'next_steps'
+        
+        # Extract bullet points or numbered items
+        if line.startswith(('-', '•', '*', '1.', '2.', '3.', '4.', '5.')):
+            clean_line = line.lstrip('-•*123456789. ').strip()
+            if len(clean_line) > 10:  # Ignore very short lines
+                if current_section == 'insights' and len(insights) < 3:
+                    insights.append(clean_line)
+                elif current_section == 'actions' and len(actions) < 3:
+                    actions.append(clean_line)
+                elif current_section == 'next_steps' and len(next_steps) < 3:
+                    next_steps.append(clean_line)
+    
+    # Provide defaults if extraction failed
+    if not insights:
+        insights = [
+            "Error has been analyzed by AI",
+            "Root cause identified in the explanation above",
+            "Debugging guidance provided"
+        ]
+    
+    if not actions:
+        actions = [
+            "Review the error explanation carefully",
+            "Check the suggested fixes section",
+            "Test the proposed solutions incrementally"
+        ]
+    
+    if not next_steps:
+        next_steps = [
+            "Implement the suggested fixes",
+            "Add error handling to prevent recurrence",
+            "Document the solution for future reference"
+        ]
+    
+    return insights[:3], actions[:3], next_steps[:3]
+
+
+def extract_repo_workflow_insights(analysis: dict) -> tuple[list[str], list[str], list[str]]:
+    """Extract workflow insights from repository analysis."""
+    insights = []
+    actions = []
+    next_steps = []
+    
+    # Extract insights from summary and architecture
+    if analysis.get('summary'):
+        summary_text = analysis['summary'][:100] + "..." if len(analysis['summary']) > 100 else analysis['summary']
+        insights.append(f"Project purpose: {summary_text}")
+    
+    if analysis.get('tech_stack'):
+        tech_count = len(analysis['tech_stack'])
+        tech_list = ', '.join(analysis['tech_stack'][:3])
+        insights.append(f"Uses {tech_count} technologies including {tech_list}")
+    
+    if analysis.get('architecture'):
+        insights.append("Architecture patterns and design identified")
+    
+    # Extract actions from improvements
+    if analysis.get('improvements'):
+        for improvement in analysis['improvements'][:3]:
+            short_improvement = improvement[:150] + "..." if len(improvement) > 150 else improvement
+            actions.append(short_improvement)
+    
+    # Extract next steps from productivity insights
+    if analysis.get('productivity_insights'):
+        for insight in analysis['productivity_insights'][:3]:
+            short_insight = insight[:150] + "..." if len(insight) > 150 else insight
+            next_steps.append(short_insight)
+    
+    # Provide defaults if needed
+    if not insights:
+        insights = ["Repository structure analyzed", "Codebase patterns identified", "Tech stack detected"]
+    
+    if not actions:
+        actions = ["Review the architecture explanation", "Consider the improvement suggestions", "Evaluate tech stack choices"]
+    
+    if not next_steps:
+        next_steps = ["Implement suggested improvements", "Optimize code organization", "Enhance documentation"]
+    
+    return insights[:3], actions[:3], next_steps[:3]
+
+
+def extract_sql_workflow_insights(question: str, result_df, insight: str) -> tuple[list[str], list[str], list[str]]:
+    """Extract workflow insights from SQL query results."""
+    insights = []
+    actions = []
+    next_steps = []
+    
+    # Generate insights based on query results
+    row_count = len(result_df)
+    col_count = len(result_df.columns)
+    
+    insights.append(f"Query returned {row_count:,} rows with {col_count} columns")
+    
+    # Truncate insight if too long
+    short_insight = insight[:100] + "..." if len(insight) > 100 else insight
+    insights.append(f"Analysis: {short_insight}")
+    
+    if row_count > 0:
+        insights.append("Data successfully retrieved and visualized")
+    else:
+        insights.append("Query executed but returned no results")
+    
+    # Suggest actions based on results
+    if row_count > 100:
+        actions.append("Consider adding filters to narrow down results")
+        actions.append("Export data for deeper analysis in external tools")
+    else:
+        actions.append("Results are manageable - review the visualization")
+        actions.append("Refine query if more data is needed")
+    
+    actions.append("Download CSV for offline analysis if needed")
+    
+    # Next steps for productivity
+    next_steps.append("Save this query for future reference")
+    next_steps.append("Create a dashboard with multiple related queries")
+    next_steps.append("Share insights with your team")
+    
+    return insights[:3], actions[:3], next_steps[:3]
+
+
+def calculate_productivity_score(repo_info: dict, analysis: dict) -> dict:
+    """
+    Calculate AI Productivity Score based on repository data and analysis.
+    Returns a dict with overall score, dimension scores, and suggestions.
+    
+    Score Dimensions (weighted):
+    - Documentation Quality (20%): README, comments, docstrings
+    - Architecture Clarity (25%): Structure, organization, modularity
+    - Debugging Readiness (20%): Error handling, logging, tests
+    - Workflow Efficiency (20%): CI/CD, automation, dependencies
+    - AI Readiness (15%): Code clarity, naming, API docs
+    """
+    
+    dimensions = {}
+    
+    # 1. Documentation Quality (20%)
+    doc_score = 0
+    readme_length = len(repo_info.get('readme', ''))
+    if readme_length > 2000:
+        doc_score += 40
+    elif readme_length > 1000:
+        doc_score += 30
+    elif readme_length > 500:
+        doc_score += 20
+    else:
+        doc_score += 10
+    
+    # Check for description
+    if repo_info.get('description'):
+        doc_score += 20
+    
+    # Check for topics/tags
+    if len(repo_info.get('topics', [])) >= 3:
+        doc_score += 20
+    elif len(repo_info.get('topics', [])) >= 1:
+        doc_score += 10
+    
+    # Check file structure for docs
+    files = repo_info.get('file_structure', [])
+    if any('LICENSE' in f.upper() for f in files):
+        doc_score += 10
+    if any('CONTRIBUTING' in f.upper() for f in files):
+        doc_score += 10
+    
+    dimensions['Documentation Quality'] = min(100, doc_score)
+    
+    # 2. Architecture Clarity (25%)
+    arch_score = 0
+    
+    # Check for organized structure
+    common_dirs = ['src', 'lib', 'app', 'tests', 'docs', 'config', 'utils']
+    dir_count = sum(1 for d in common_dirs if any(d in f.lower() for f in files))
+    arch_score += min(40, dir_count * 8)
+    
+    # Check for config files
+    config_files = ['package.json', 'requirements.txt', 'setup.py', 'pyproject.toml', 'Cargo.toml', 'go.mod']
+    if any(cf in files for cf in config_files):
+        arch_score += 20
+    
+    # Check language diversity (but not too many)
+    lang_count = len(repo_info.get('languages', {}))
+    if 2 <= lang_count <= 5:
+        arch_score += 20
+    elif lang_count == 1:
+        arch_score += 15
+    else:
+        arch_score += 10
+    
+    # Bonus for analysis mentioning good architecture
+    if analysis and 'architecture' in analysis.get('architecture', '').lower():
+        arch_score += 20
+    
+    dimensions['Architecture Clarity'] = min(100, arch_score)
+    
+    # 3. Debugging Readiness (20%)
+    debug_score = 0
+    
+    # Check for test files
+    test_indicators = ['test', 'spec', '__tests__', 'tests']
+    if any(ti in ' '.join(files).lower() for ti in test_indicators):
+        debug_score += 30
+    
+    # Check for CI/CD
+    ci_files = ['.github', '.gitlab-ci', 'Jenkinsfile', '.travis.yml', 'circle.yml']
+    if any(ci in ' '.join(files).lower() for ci in ci_files):
+        debug_score += 25
+    
+    # Check for logging/error handling mentions
+    if analysis:
+        improvements = ' '.join(analysis.get('improvements', []))
+        if 'error' in improvements.lower() or 'logging' in improvements.lower():
+            debug_score += 15
+        else:
+            debug_score += 25  # Assume good if not mentioned as improvement
+    
+    # Stars indicate community trust
+    stars = repo_info.get('stars', 0)
+    if stars > 1000:
+        debug_score += 20
+    elif stars > 100:
+        debug_score += 15
+    elif stars > 10:
+        debug_score += 10
+    
+    dimensions['Debugging Readiness'] = min(100, debug_score)
+    
+    # 4. Workflow Efficiency (20%)
+    workflow_score = 0
+    
+    # CI/CD presence
+    if any(ci in ' '.join(files).lower() for ci in ci_files):
+        workflow_score += 30
+    
+    # Dependency management
+    dep_files = ['package.json', 'requirements.txt', 'Gemfile', 'Cargo.toml', 'go.mod', 'pom.xml']
+    if any(df in files for df in dep_files):
+        workflow_score += 25
+    
+    # Docker/containerization
+    if any('docker' in f.lower() for f in files):
+        workflow_score += 20
+    
+    # Scripts/automation
+    script_dirs = ['scripts', 'bin', '.github/workflows']
+    if any(sd in ' '.join(files).lower() for sd in script_dirs):
+        workflow_score += 15
+    
+    # Recent activity
+    if repo_info.get('open_issues', 0) < 50:
+        workflow_score += 10
+    
+    dimensions['Workflow Efficiency'] = min(100, workflow_score)
+    
+    # 5. AI Readiness (15%)
+    ai_score = 0
+    
+    # Good README helps AI understand
+    if readme_length > 1500:
+        ai_score += 30
+    elif readme_length > 800:
+        ai_score += 20
+    else:
+        ai_score += 10
+    
+    # Clear tech stack
+    if len(repo_info.get('languages', {})) <= 5:
+        ai_score += 20
+    
+    # Topics help categorization
+    if len(repo_info.get('topics', [])) >= 3:
+        ai_score += 20
+    elif len(repo_info.get('topics', [])) >= 1:
+        ai_score += 10
+    
+    # Analysis quality indicates code clarity
+    if analysis and len(analysis.get('tech_stack', [])) >= 3:
+        ai_score += 15
+    
+    # Description clarity
+    if repo_info.get('description') and len(repo_info.get('description', '')) > 50:
+        ai_score += 15
+    
+    dimensions['AI Readiness'] = min(100, ai_score)
+    
+    # Calculate weighted overall score
+    weights = {
+        'Documentation Quality': 0.20,
+        'Architecture Clarity': 0.25,
+        'Debugging Readiness': 0.20,
+        'Workflow Efficiency': 0.20,
+        'AI Readiness': 0.15
+    }
+    
+    overall_score = sum(dimensions[dim] * weights[dim] for dim in dimensions)
+    overall_score = int(overall_score)
+    
+    # Generate suggestions for lower-scoring dimensions
+    suggestions = []
+    for dim, score in dimensions.items():
+        if score < 70:
+            if dim == 'Documentation Quality':
+                suggestions.append("Enhance README with setup instructions, usage examples, and API documentation")
+            elif dim == 'Architecture Clarity':
+                suggestions.append("Organize code into clear modules/packages with separation of concerns")
+            elif dim == 'Debugging Readiness':
+                suggestions.append("Add comprehensive test coverage and implement CI/CD pipelines")
+            elif dim == 'Workflow Efficiency':
+                suggestions.append("Set up automated workflows, dependency management, and containerization")
+            elif dim == 'AI Readiness':
+                suggestions.append("Improve code documentation and add descriptive comments for AI analysis")
+    
+    # Limit to top 3 suggestions
+    suggestions = suggestions[:3]
+    
+    # If score is high, add positive reinforcement
+    if overall_score >= 80 and not suggestions:
+        suggestions = [
+            "Excellent work! Consider sharing your best practices with the community",
+            "Maintain this quality by keeping documentation up-to-date",
+            "Your codebase is well-structured for AI-assisted development"
+        ]
+    
+    return {
+        'overall_score': overall_score,
+        'dimensions': dimensions,
+        'suggestions': suggestions
+    }
+
+
+def get_score_category(score: int) -> tuple[str, str]:
+    """Return category label and CSS class for a score."""
+    if score >= 90:
+        return "Excellent", "excellent"
+    elif score >= 70:
+        return "Good", "good"
+    elif score >= 50:
+        return "Moderate", "moderate"
+    else:
+        return "Needs Improvement", "needs-improvement"
+
+
+def render_productivity_score_card(score_data: dict) -> None:
+    """Render the AI Productivity Score card with full details."""
+    overall_score = score_data['overall_score']
+    dimensions = score_data['dimensions']
+    suggestions = score_data['suggestions']
+    
+    category_label, category_class = get_score_category(overall_score)
+    
+    # Build dimension items HTML
+    dimension_items_html = ""
+    for dim_name, dim_score in dimensions.items():
+        dim_category_label, dim_category_class = get_score_category(dim_score)
+        dimension_items_html += f"""
+        <div class="dimension-item">
+            <div class="dimension-header">
+                <span class="dimension-name">{dim_name}</span>
+                <span class="dimension-score {dim_category_class}">{dim_score}/100</span>
+            </div>
+            <div class="dimension-bar">
+                <div class="dimension-bar-fill {dim_category_class}" style="width: {dim_score}%;"></div>
+            </div>
+        </div>
+        """
+    
+    # Build suggestions HTML
+    suggestions_html = ""
+    if suggestions:
+        suggestions_items = "".join([f"<li>{sug}</li>" for sug in suggestions])
+        suggestions_html = f"""
+        <div class="score-suggestions">
+            <div class="suggestions-title">💡 Recommendations</div>
+            <ul class="suggestions-list">
+                {suggestions_items}
+            </ul>
+        </div>
+        """
+    
+    # Render the complete card
+    card_html = f"""
+    <div class="productivity-score-card">
+        <div class="score-header">
+            <div class="score-title">🤖 AI Productivity Score</div>
+            <div class="score-subtitle">Comprehensive analysis of repository quality and developer readiness</div>
+        </div>
+        
+        <div class="score-display">
+            <div class="score-circle {category_class}">
+                <div class="score-number">{overall_score}</div>
+                <div class="score-label">{category_label}</div>
+            </div>
+        </div>
+        
+        <div class="score-dimensions">
+            {dimension_items_html}
+        </div>
+        
+        {suggestions_html}
+    </div>
+    """
+    
+    st.markdown(card_html, unsafe_allow_html=True)
+
+
+def render_score_badge_compact(score: int) -> str:
+    """Return HTML for a compact score badge."""
+    category_label, category_class = get_score_category(score)
+    return f'<span class="score-badge-compact {category_class}">⚡ Score: {score}/100</span>'
+
+
 def render_sidebar() -> None:
     st.sidebar.title("⚙️ DevFlow AI")
     st.sidebar.markdown(
@@ -1061,7 +2011,21 @@ def main() -> None:
                     st.dataframe(result_df, use_container_width=True)
 
                     st.subheader("Insight")
-                    st.success(generate_local_insight(result_df))
+                    insight_text = generate_local_insight(result_df)
+                    st.success(insight_text)
+                    
+                    # Add AI Workflow Summary for SQL Analytics
+                    st.write("---")
+                    insights, actions, next_steps = extract_sql_workflow_insights(
+                        user_question, result_df, insight_text
+                    )
+                    render_workflow_summary(
+                        "SQL Query Analysis",
+                        insights,
+                        actions,
+                        next_steps,
+                        "SQL Copilot"
+                    )
 
                     st.subheader("Visualization")
                     chart_type = detect_chart_type(result_df)
@@ -1205,6 +2169,17 @@ def main() -> None:
                         explanation = explain_error_text(trace_text)
                         st.subheader("Explanation")
                         st.info(explanation)
+                        
+                        # Add AI Workflow Summary for Error Explainer
+                        st.write("---")
+                        insights, actions, next_steps = extract_error_workflow_insights(explanation)
+                        render_workflow_summary(
+                            "Error Analysis",
+                            insights,
+                            actions,
+                            next_steps,
+                            "Debug Copilot"
+                        )
 
 
     with tab6:
@@ -1337,6 +2312,23 @@ def main() -> None:
                                         """,
                                         unsafe_allow_html=True,
                                     )
+                            
+                            # Add AI Productivity Score
+                            st.write("---")
+                            with st.spinner("Calculating AI Productivity Score..."):
+                                score_data = calculate_productivity_score(repo_info, analysis)
+                                render_productivity_score_card(score_data)
+                            
+                            # Add AI Workflow Summary for Repository Explainer
+                            st.write("---")
+                            insights, actions, next_steps = extract_repo_workflow_insights(analysis)
+                            render_workflow_summary(
+                                "Repository Analysis",
+                                insights,
+                                actions,
+                                next_steps,
+                                "Repo Copilot"
+                            )
 
 
 if __name__ == "__main__":
