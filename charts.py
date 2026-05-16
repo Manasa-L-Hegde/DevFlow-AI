@@ -219,7 +219,7 @@ def create_bar_chart(df: pd.DataFrame, x: Optional[str] = None, y: Optional[str]
     
     # Apply cyberpunk theme
     fig = apply_cyberpunk_theme(fig)
-    fig.update_layout(hovermode='x unified', height=500)
+    fig.update_layout(hovermode='x unified', height=600)
     
     return fig
 
@@ -246,7 +246,7 @@ def create_frequency_bar_chart(df: pd.DataFrame):
     )
 
     fig = apply_cyberpunk_theme(fig)
-    fig.update_layout(hovermode='x unified', height=500)
+    fig.update_layout(hovermode='x unified', height=600)
     return fig
 
 
@@ -275,10 +275,10 @@ def create_line_chart(df: pd.DataFrame, x: Optional[str] = None, y: Optional[str
     )
     
     fig = apply_cyberpunk_theme(fig)
-    fig.update_layout(hovermode='x unified', height=500)
+    fig.update_layout(hovermode='x unified', height=600)
     
     # Enhanced glow effect for line charts
-    fig.update_traces(line=dict(width=4), marker=dict(size=8))
+    fig.update_traces(line=dict(width=4), marker=dict(size=10))
     
     return fig
 
@@ -307,7 +307,7 @@ def create_area_chart(df: pd.DataFrame, x: Optional[str] = None, y: Optional[str
     )
     
     fig = apply_cyberpunk_theme(fig)
-    fig.update_layout(hovermode='x unified', height=500)
+    fig.update_layout(hovermode='x unified', height=600)
     
     # Add fill opacity for area effect
     fig.update_traces(fillcolor='rgba(0, 255, 255, 0.2)')
@@ -336,10 +336,10 @@ def create_scatter_chart(df: pd.DataFrame, x: Optional[str] = None, y: Optional[
     )
     
     fig = apply_cyberpunk_theme(fig)
-    fig.update_layout(height=500)
+    fig.update_layout(height=600)
     
     # Enhanced markers with glow
-    fig.update_traces(marker=dict(size=10, line=dict(width=2, color='#00FFFF')))
+    fig.update_traces(marker=dict(size=12, line=dict(width=2, color='#00FFFF')))
     
     return fig
 
@@ -363,13 +363,14 @@ def create_pie_chart(df: pd.DataFrame, values: Optional[str] = None, names: Opti
     )
     
     fig = apply_cyberpunk_theme(fig)
-    fig.update_layout(height=500)
+    fig.update_layout(height=600)
     
     # Enhanced pie styling
     fig.update_traces(
         textposition='inside',
         textinfo='percent+label',
-        marker=dict(line=dict(color='#000000', width=2))
+        marker=dict(line=dict(color='#000000', width=2)),
+        textfont=dict(size=14)
     )
     
     return fig

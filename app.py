@@ -94,14 +94,14 @@ def apply_styles() -> None:
 
         /* ===== HERO SECTION ===== */
         .nl-hero {
-            padding: var(--spacing-2xl) var(--spacing-lg);
-            border: 1px solid rgba(0, 240, 255, 0.2);
+            padding: var(--spacing-3xl) var(--spacing-xl);
+            border: 1px solid rgba(0, 240, 255, 0.4);
             border-radius: var(--border-radius-xl);
             background: linear-gradient(145deg, rgba(13, 6, 20, 0.7), rgba(5, 1, 13, 0.9));
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(209, 0, 255, 0.05);
-            margin-bottom: var(--spacing-xl);
+            box-shadow: 0 20px 80px rgba(0, 240, 255, 0.2), 0 0 60px rgba(209, 0, 255, 0.15);
+            margin-bottom: var(--spacing-2xl);
             position: relative;
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -135,17 +135,17 @@ def apply_styles() -> None:
             color: #00f0ff;
             text-transform: uppercase;
             letter-spacing: 0.3em;
-            font-size: 0.85rem;
+            font-size: 1rem;
             font-weight: 700;
             margin-bottom: var(--spacing-sm);
             position: relative;
             z-index: 1;
-            text-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.8);
         }
 
         .nl-title {
             font-family: 'Syncopate', sans-serif;
-            font-size: clamp(2rem, 5vw, 4rem);
+            font-size: clamp(2.5rem, 6vw, 5rem);
             font-weight: 700;
             line-height: 1.1;
             margin: 0;
@@ -154,15 +154,15 @@ def apply_styles() -> None:
             -webkit-text-fill-color: transparent;
             position: relative;
             z-index: 1;
-            filter: drop-shadow(0 0 10px rgba(209,0,255,0.2));
+            filter: drop-shadow(0 0 20px rgba(209,0,255,0.4));
         }
 
         .nl-subtitle {
             color: #a19fb0;
-            font-size: clamp(1rem, 2vw, 1.2rem);
-            margin-top: var(--spacing-md);
+            font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+            margin-top: var(--spacing-lg);
             max-width: 52rem;
-            line-height: 1.7;
+            line-height: 1.8;
             position: relative;
             z-index: 1;
             font-weight: 400;
@@ -176,12 +176,12 @@ def apply_styles() -> None:
             background: rgba(13, 6, 20, 0.5);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            padding: var(--spacing-lg);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            transition: all 0.3s ease;
+            padding: var(--spacing-xl);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(209, 0, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
-            margin-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
         }
 
         .nl-card::after {
@@ -208,25 +208,26 @@ def apply_styles() -> None:
         }
 
         .nl-card-strong {
-            border: 1px solid rgba(0, 240, 255, 0.2);
+            border: 2px solid rgba(0, 240, 255, 0.3);
             background: linear-gradient(180deg, rgba(20, 9, 30, 0.8), rgba(13, 6, 20, 0.6));
-            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.05);
+            box-shadow: 0 15px 50px rgba(0, 240, 255, 0.15), inset 0 0 30px rgba(0, 240, 255, 0.05);
         }
 
         .nl-section-title {
             font-family: 'Syncopate', sans-serif;
-            font-size: clamp(1rem, 2vw, 1.1rem);
+            font-size: clamp(1.2rem, 2.5vw, 1.4rem);
             font-weight: 700;
-            margin-bottom: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
             color: #ffffff;
             letter-spacing: 0.05em;
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
         }
 
         .nl-section-copy {
             color: #a19fb0;
-            font-size: clamp(0.9rem, 1.5vw, 1rem);
+            font-size: clamp(1rem, 1.8vw, 1.15rem);
             margin-bottom: var(--spacing-md);
-            line-height: 1.6;
+            line-height: 1.8;
         }
 
         /* ===== PILLS/TAGS ===== */
@@ -264,21 +265,22 @@ def apply_styles() -> None:
         }
 
         .stTabs [data-baseweb="tab"] {
-            height: 3.2rem;
+            height: 3.8rem;
             border-radius: var(--border-radius-sm);
             color: #a19fb0;
-            padding-left: clamp(1rem, 3vw, 2rem);
-            padding-right: clamp(1rem, 3vw, 2rem);
+            padding-left: clamp(1.2rem, 3.5vw, 2.5rem);
+            padding-right: clamp(1.2rem, 3.5vw, 2.5rem);
             font-weight: 600;
             font-family: 'Syncopate', sans-serif;
-            font-size: clamp(0.75rem, 1.5vw, 0.9rem);
-            transition: all 0.3s ease;
+            font-size: clamp(0.85rem, 1.8vw, 1rem);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             white-space: nowrap;
         }
 
         .stTabs [data-baseweb="tab"]:hover {
             background: rgba(0, 240, 255, 0.05);
             color: #00f0ff;
+            transform: translateY(-2px);
         }
 
         .stTabs [aria-selected="true"] {
@@ -286,33 +288,33 @@ def apply_styles() -> None:
             color: #ffffff !important;
             border: 1px solid rgba(0, 240, 255, 0.3);
             border-bottom: 2px solid #00f0ff !important;
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
         }
 
         /* ===== METRICS ===== */
         div[data-testid="stMetric"] {
             background: rgba(13, 6, 20, 0.6);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(0, 240, 255, 0.2);
             border-radius: var(--border-radius-lg);
-            padding: var(--spacing-md) var(--spacing-lg);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: var(--spacing-lg) var(--spacing-xl);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 240, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border-left: 3px solid #d100ff;
             margin-bottom: var(--spacing-sm);
         }
         
         div[data-testid="stMetric"]:hover {
-            transform: translateY(-5px) scale(1.02);
+            transform: translateY(-8px) scale(1.03);
             border-color: rgba(209, 0, 255, 0.5);
             border-left: 4px solid #00f0ff;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 240, 255, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 240, 255, 0.25), 0 0 40px rgba(209, 0, 255, 0.2);
         }
 
         div[data-testid="stMetricLabel"] {
             font-weight: 600;
             color: #a19fb0;
-            font-size: 0.95rem;
+            font-size: 1.1rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
@@ -321,8 +323,8 @@ def apply_styles() -> None:
             font-family: 'Syncopate', sans-serif;
             font-weight: 700;
             color: #ffffff;
-            font-size: clamp(1.5rem, 3vw, 2.2rem);
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
 
         /* ===== INPUT FIELDS ===== */
@@ -347,6 +349,8 @@ def apply_styles() -> None:
             border-radius: var(--border-radius-sm) !important;
             font-family: 'Syncopate', sans-serif !important;
             font-weight: 700 !important;
+            padding: var(--spacing-md) var(--spacing-xl) !important;
+            font-size: 1.05rem !important;
             text-transform: uppercase !important;
             letter-spacing: 0.05em !important;
             padding: var(--spacing-sm) var(--spacing-md) !important;
