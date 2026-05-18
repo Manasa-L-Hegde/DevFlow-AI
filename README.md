@@ -444,7 +444,7 @@ KeyError: 'column_name'
 
 **🚀 [Try DevFlow AI Now](https://devflow-ai-se86qe7zzchyre8pvvgepd.streamlit.app/)**
 
-Note:
+Note: The demo is hosted on Streamlit Community Cloud (free tier), so initial startup may take a few seconds.
 
 The application is deployed on Streamlit Cloud with automatic updates from the main branch.
 
