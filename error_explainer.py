@@ -5,7 +5,7 @@ explanation plus step-by-step debugging suggestions. Reuses the Groq/OpenAI
 client configured in `ai.py`.
 """
 from typing import Optional
-from ai import get_openai_client
+from ai import get_openai_client, create_chat_completion
 
 
 def explain_error_text(trace_text: str) -> str:
@@ -34,8 +34,8 @@ def explain_error_text(trace_text: str) -> str:
     user_prompt = f"Error text:\n\n{trace_text}\n\nRespond with sections labeled: Summary, Possible Causes, Debug Steps, Suggested Fixes."
 
     try:
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+        response = create_chat_completion(
+            client,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},

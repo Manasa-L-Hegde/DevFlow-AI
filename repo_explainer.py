@@ -9,30 +9,7 @@ import json
 from typing import Dict, Optional, Tuple
 import requests
 from dotenv import load_dotenv
-
-try:
-    from openai import OpenAI
-except ImportError:
-    OpenAI = None
-
-
-# Load environment variables
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ENV_PATH = os.path.join(BASE_DIR, ".env")
-load_dotenv(ENV_PATH)
-
-
-def get_openai_client():
-    """Create an OpenAI-compatible client configured for Groq."""
-    api_key = os.getenv("GROQ_API_KEY")
-    
-    if not api_key or OpenAI is None:
-        return None
-    
-    return OpenAI(
-        api_key=api_key,
-        base_url="https://api.groq.com/openai/v1",
-    )
+from ai import get_openai_client, create_chat_completion
 
 
 def parse_github_url(url: str) -> Optional[Tuple[str, str]]:
@@ -195,8 +172,8 @@ Be specific, professional, and focus on actionable insights that help developers
 Provide a comprehensive analysis following the JSON format specified."""
 
     try:
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+        response = create_chat_completion(
+            client,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message},
@@ -208,7 +185,12 @@ Provide a comprehensive analysis following the JSON format specified."""
         ai_response = response.choices[0].message.content or ""
         
         try:
-            analysis = json.loads(ai_response)
+            clean_json = ai_response.strip()
+            if "```json" in clean_json:
+                clean_json = clean_json.split("```json", 1)[1].split("```", 1)[0].strip()
+            elif "```" in clean_json:
+                clean_json = clean_json.split("```", 1)[1].split("```", 1)[0].strip()
+            analysis = json.loads(clean_json)
             return analysis
         except json.JSONDecodeError:
             return None
